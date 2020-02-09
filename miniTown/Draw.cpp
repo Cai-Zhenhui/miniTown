@@ -28,16 +28,16 @@ void CleanScreen()
 	}
 }
 
-void DrawBmp(int x, int y)
+void DrawBmp(int x, int y,Picture *pic)
 {
-	for (float i = 0; i < bmpHeight; i++)
+	for (float i = 0; i < pic->bmpHeight; i++)
 	{
-		for (float j = 0; j < bmpWidth; j++)
+		for (float j = 0; j < pic->bmpWidth; j++)
 		{
 			Color color;
-			color = loadTexture((j / (float)bmpWidth), (i / (float)bmpHeight));
+			color = loadTexture((j / (float)pic->bmpWidth), (i / (float)pic->bmpHeight),&picFlag);
 
-			DrawPoint(x+j, y+bmpHeight - i, color);
+			DrawPoint(x+j, y+pic->bmpHeight - i, color);
 		}
 	}
 
@@ -46,7 +46,7 @@ void DrawBmp(int x, int y)
 void Draw()
 {
 	CleanScreen();
-	DrawBmp(Flag.x, Flag.y);
+	DrawBmp(Flag.x, Flag.y,&picFlag);
 
 	screen_update();
 	

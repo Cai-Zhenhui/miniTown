@@ -2,6 +2,7 @@
 using namespace std;
 
 Object Flag;
+Picture picFlag;
 
 int main()
 {
@@ -15,7 +16,7 @@ int main()
 	}
 	
 	cout << "miniTown" << endl;
-	readBmp("1~1.bmp");
+	readBmp("1~1.bmp",picFlag);
 	while (1)
 	{
 		KeyControl();

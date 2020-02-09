@@ -51,13 +51,19 @@ void KeyControl();
 
 //=========================================================
 //	读取图片
-extern unsigned char* pBmpBuf;//读入图像数据的指针
-extern int bmpWidth;//图像的宽
-extern int bmpHeight;//图像的高
-extern RGBQUAD* pColorTable;//颜色表指针
-extern int biBitCount;//图像类型，每像素位数
-bool readBmp(const char* bmpName);
-Color loadTexture(double u, double v);
+
+
+class Picture
+{
+public:
+	unsigned char* pBmpBuf;//读入图像数据的指针
+	int bmpWidth;//图像的宽
+	int bmpHeight;//图像的高
+	RGBQUAD* pColorTable;//颜色表指针
+	int biBitCount;//图像类型，每像素位数
+};
+
+extern Picture picFlag;
 
 class Object
 {
@@ -67,3 +73,7 @@ public:
 };
 
 extern Object Flag;
+
+bool readBmp(const char* bmpName, Picture& pic);
+void DrawBmp(int x, int y, Picture* pic);
+Color loadTexture(double u, double v, Picture* pic);
