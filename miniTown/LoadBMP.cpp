@@ -10,6 +10,12 @@ Color loadTexture(double u, double v,Picture *pic) //u ->x v ->y
 	return Color(pic->pBmpBuf[y * pic->bmpWidth * 3 + x * 3 + 2], pic->pBmpBuf[y * pic->bmpWidth * 3 + x * 3 + 1], pic->pBmpBuf[y *pic-> bmpWidth * 3 + x * 3]);
 }
 
+Color loadTexture(int x, int y, Picture* pic)
+{
+	return Color(pic->pBmpBuf[y * pic->bmpWidth * 3 + x * 3 + 2], pic->pBmpBuf[y * pic->bmpWidth * 3 + x * 3 + 1], pic->pBmpBuf[y * pic->bmpWidth * 3 + x * 3]);
+
+}
+
 //-----------------------------------------------------------------------------------------
 //给定一个图像位图数据、宽、高、颜色表指针及每像素所占的位数等信息,将其写到指定文件中
 bool readBmp(const char* bmpName,Picture &pic)

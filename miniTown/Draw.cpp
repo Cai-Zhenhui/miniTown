@@ -1,9 +1,50 @@
 #include"miniTown.h"
 
+Object* drawList[1000];
+int drawSum=0;
 
 BYTE buffer[SCREEN_WIDTH * SCREEN_HEIGHT * bits / 8];
+HWND screen_handle = NULL;		// 主窗口 HWND
 
-void DrawPoint(int x, int y, const Color color)
+void AddDrawObject(Object* object)
+{
+	bool findFlag = false;
+	for (int i = 0; i < drawSum; i++)
+	{
+		if (drawList[i] == object)
+		{
+			findFlag = true;
+		}
+	}
+	if (!findFlag)
+	{
+		drawList[drawSum] = object;
+		drawSum++;
+	}
+}
+
+void RemoveDrawObecjt(Object* object)
+{
+	int findIndex = -1;
+	for (int i = 0; i < drawSum; i++)
+	{
+		if (drawList[i] == object)
+		{
+			findIndex = i;
+			break;
+		}
+	}
+	if (findIndex != -1)
+	{
+		for (int i = findIndex; i < drawSum-1; i++)
+		{
+			drawList[i] = drawList[i + 1];
+		}
+		drawSum--;
+	}
+}
+
+void DrawPoint(int &x, int &y, const Color &color)
 {
 	if (x <= 0 || x >= SCREEN_WIDTH)return;
 	if (y <= 0 || y >= SCREEN_HEIGHT)return;
@@ -11,6 +52,16 @@ void DrawPoint(int x, int y, const Color color)
 	buffer[int(y) * SCREEN_WIDTH * 3 + (int(x) + 1) * 3 - 1] = color.r;
 	buffer[int(y) * SCREEN_WIDTH * 3 + (int(x) + 1) * 3 - 2] = color.g;
 	buffer[int(y) * SCREEN_WIDTH * 3 + (int(x) + 1) * 3 - 3] = color.b;
+}
+
+void DrawPoint(int& x, int& y, int &r,int &g,int &b)
+{
+	if (x <= 0 || x >= SCREEN_WIDTH)return;
+	if (y <= 0 || y >= SCREEN_HEIGHT)return;
+
+	buffer[int(y) * SCREEN_WIDTH * 3 + (int(x) + 1) * 3 - 1] = r;
+	buffer[int(y) * SCREEN_WIDTH * 3 + (int(x) + 1) * 3 - 2] = g;
+	buffer[int(y) * SCREEN_WIDTH * 3 + (int(x) + 1) * 3 - 3] = b;
 }
 
 
@@ -30,32 +81,54 @@ void CleanScreen()
 
 void DrawBmp(int x, int y,Picture *pic)
 {
-	for (float i = 0; i < pic->bmpHeight; i++)
-	{
-		for (float j = 0; j < pic->bmpWidth; j++)
-		{
-			Color color;
-			color = loadTexture((j / (float)pic->bmpWidth), (i / (float)pic->bmpHeight),&picFlag);
+	int bufHeight;
+	int bufWidth;
+	int DrawX;
+	int DrawY;
+	int DrawR;
+	int DrawG;
+	int DrawB;
 
-			DrawPoint(x+j, y+pic->bmpHeight - i, color);
+	for (int i = 0; i < pic->bmpHeight; i++)
+	{
+		bufHeight = i * pic->bmpWidth * 3;
+		for (int j = 0; j < pic->bmpWidth; j++)
+		{
+			bufWidth = j * 3;
+			DrawR = pic->pBmpBuf[bufHeight + bufWidth + 2];
+			DrawG = pic->pBmpBuf[bufHeight + bufWidth + 1];
+			DrawB = pic->pBmpBuf[bufHeight + bufWidth];
+			
+			if (DrawR != 255 || DrawG != 255 || DrawB != 255)
+			{
+				DrawX = x + j;
+				DrawY = y + pic->bmpHeight - i;
+				DrawPoint(DrawX, DrawY, DrawR, DrawG, DrawB);
+			}
 		}
 	}
 
 }
 
+
+
 void Draw()
 {
 	CleanScreen();
-	DrawBmp(Flag.x, Flag.y,&picFlag);
+	for (int i = 0; i < drawSum; i++)
+	{
+		Object* drawNowObject = drawList[i];
+		DrawBmp(drawNowObject->x, drawNowObject->y, drawNowObject->pic);
+
+	}
 
 	screen_update();
-	
 }
 
 int screen_w, screen_h, screen_exit = 0;
 int screen_mx = 0, screen_my = 0, screen_mb = 0;
 int screen_keys[512];	// 当前键盘按下状态
-static HWND screen_handle = NULL;		// 主窗口 HWND
+
 static HDC screen_dc = NULL;			// 配套的 HDC
 static HBITMAP screen_hb = NULL;		// DIB
 static HBITMAP screen_ob = NULL;		// 老的 BITMAP
@@ -192,26 +265,3 @@ void screen_update(void) {
 	MsgGet();
 }
 
-void KeyControl()
-{
-	if (screen_keys[VK_ESCAPE])
-	{
-		exit(1);		//正常结束
-	}
-	if (screen_keys['W'])
-	{
-		Flag.y--;
-	}
-	if (screen_keys['S'])
-	{
-		Flag.y++;
-	}
-	if (screen_keys['A'])
-	{
-		Flag.x--;
-	}
-	if (screen_keys['D'])
-	{
-		Flag.x++;
-	}
-}
