@@ -8,7 +8,7 @@
 
 //用于显示窗体的全局变量
 //----------------------------------
-const int SCREEN_WIDTH = 1200;
+const int SCREEN_WIDTH = 600;
 const int SCREEN_HEIGHT = 600;
 const int bits = 24;
 extern BYTE buffer[SCREEN_WIDTH * SCREEN_HEIGHT * bits / 8];
@@ -16,14 +16,9 @@ extern BYTE buffer[SCREEN_WIDTH * SCREEN_HEIGHT * bits / 8];
 
 //-----------------------------------
 
-//用于处理排序数据的全局变量
-//-----------------------------------
-const int DataSum = SCREEN_WIDTH;
-extern int DataMax;
-extern int DataMin;
-extern int data[DataSum];
-extern int nowIndex;
-//-----------------------------------
+
+extern int runtime;
+extern int LastFPS;
 
 
 class Color
@@ -55,6 +50,24 @@ public:
 
 class Field
 {
+public:
+	int id;
+	float growingTime;
+	Object *DrawObject;
+};
+
+class House
+{
+public:
+	int id;
+	Object *DrawObject;
+};
+
+class Rice
+{
+public:
+	int id;
+	Object* DrawObject;
 
 };
 
@@ -64,7 +77,16 @@ public:
 	int id;
 	float age;
 	int monney;
+	Field* belongField;
+	House* belongHouse;
+	Object*DrawObject;
+	int wantFoodLevel;
+	int wantSexLevel;
+	void AI();
 };
+
+
+
 
 
 
@@ -72,6 +94,7 @@ void CleanScreen();
 void Draw();
 extern Object* drawList[1000];
 extern int drawSum;
+
 void AddDrawObject(Object* object);
 void RemoveDrawObecjt(Object* object);
 void DrawPoint(int &x, int &y, const Color &color );
@@ -97,3 +120,15 @@ void DrawRect(int x, int y, int w, int h,Color color);
 void DrawBmp(int x, int y, Picture* pic);
 Color loadTexture(double u, double v, Picture* pic);
 Color loadTexture(int x, int y, Picture* pic);
+
+
+extern Picture picLand;
+extern Picture picHouse;
+extern Picture picFarmer;
+extern Picture picBuilder;
+extern Picture picField;
+extern Picture picField1;
+extern Picture picField2;
+extern Picture picTree;
+extern Picture picKing;
+extern Picture picRice;

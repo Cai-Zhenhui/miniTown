@@ -29,5 +29,8 @@
     <ClCompile Include="LoadBMP.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="AI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
