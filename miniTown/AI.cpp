@@ -30,7 +30,7 @@ void Farmer::AI()
 		belongField->DrawObject->pic = &picField2;
 	}
 	
-	else if (belongField->growingTime > 40)
+	else if (belongField->growingTime <40)
 	{
 		belongField->DrawObject->pic = &picRice;
 
