@@ -8,7 +8,7 @@
 
 //用于显示窗体的全局变量
 //----------------------------------
-const int SCREEN_WIDTH = 600;
+const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 600;
 const int bits = 24;
 extern BYTE buffer[SCREEN_WIDTH * SCREEN_HEIGHT * bits / 8];
@@ -53,6 +53,19 @@ public:
 	Picture* pic;
 };
 
+class Field
+{
+
+};
+
+class Farmer
+{
+public:
+	int id;
+	float age;
+	int monney;
+};
+
 
 
 void CleanScreen();
@@ -80,6 +93,7 @@ extern HWND screen_handle;		// 主窗口 HWND
 
 
 bool readBmp(const char* bmpName, Picture& pic);
+void DrawRect(int x, int y, int w, int h,Color color);
 void DrawBmp(int x, int y, Picture* pic);
 Color loadTexture(double u, double v, Picture* pic);
 Color loadTexture(int x, int y, Picture* pic);

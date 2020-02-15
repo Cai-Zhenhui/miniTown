@@ -10,12 +10,17 @@ Picture picField;
 Picture picTree;
 Picture picKing;
 
-Object Land[10][10];
-Object House[30];
+const int MaxHouseSum = 10 * 10;
+const int MaxFieldSum = 10 * 10;
+const int MaxTreeSum = 10 * 10;
+int NowHouseSum = 0;
+int NowFieldSum = 0;
+int NowTreeSum = 0;
+Object House[MaxHouseSum];
 Object Farmer;
 Object Builder;
-Object Field[10];
-Object Tree[10];
+Object Field[MaxFieldSum];
+Object Tree[MaxTreeSum];
 Object King;
 
 void initLoadPic()
@@ -31,35 +36,25 @@ void initLoadPic()
 
 void initObject()
 {
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 10; j++)
-		{
-			Land[i][j].x = j * 60;
-			Land[i][j].y = i * 60;
-			Land[i][j].pic = &picLand;
-			AddDrawObject(&Land[i][j]);
-		}
-	}
+
 	srand(time(NULL));
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < NowHouseSum; i++)
 	{
 		House[i].pic = &picHouse;
 		House[i].x = (rand()%10)*House[i].pic->bmpWidth;
 		House[i].y = (rand() % 10) * House[i].pic->bmpHeight;
-		cout << rand() % 540 << endl;
 		
 		AddDrawObject(&House[i]);
 	}
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < NowFieldSum; i++)
 	{
 		Field[i].pic = &picField;
 		Field[i].x = (rand() % 10) * House[i].pic->bmpWidth;
 		Field[i].y = (rand() % 10) * House[i].pic->bmpHeight;
 		AddDrawObject(&Field[i]);
 	}
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < NowTreeSum; i++)
 	{
 		Tree[i].pic = &picTree;
 		Tree[i].x = (rand() % 10) * Tree[i].pic->bmpWidth;
@@ -106,6 +101,7 @@ int main()
 	int frame = 0;
 	time_t start, stop;
 	start = time(NULL);
+	int runtime = 0;
 
 
 	while (1)
@@ -120,11 +116,13 @@ int main()
 		stop = time(NULL);
 		if (stop - start >= 1)
 		{
+			runtime++;
 			start = stop;
 			char title[200];
 			sprintf_s(title, "FPS %d ", frame);
 			SetWindowText(screen_handle, title);
 			frame = 0;
+			cout << "run time:" << runtime << endl;
 		}
 
 	}

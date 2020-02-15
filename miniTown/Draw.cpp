@@ -78,7 +78,17 @@ void CleanScreen()
 		}
 	}
 }
-
+void DrawRect(int x, int y, int w, int h, Color color)
+{
+	for (int i = y; i < y + h; i++)
+	{
+		for (int j = x; j < x + w; j++)
+		{
+			DrawPoint(j, i, color);
+		}
+	}
+	
+}
 void DrawBmp(int x, int y,Picture *pic)
 {
 	int bufHeight;
@@ -115,6 +125,8 @@ void DrawBmp(int x, int y,Picture *pic)
 void Draw()
 {
 	CleanScreen();
+	Color ColorLand = Color(192, 224, 0);
+	DrawRect(0, 0, 600, 600, ColorLand);
 	for (int i = 0; i < drawSum; i++)
 	{
 		Object* drawNowObject = drawList[i];
