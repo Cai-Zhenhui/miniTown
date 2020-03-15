@@ -13,27 +13,27 @@ Picture picTree;
 Picture picKing;
 Picture picRice;
 
-const int MaxHouseSum = 10 * 10;
-const int MaxFieldSum = 10 * 10;
-const int MaxTreeSum = 10 * 10;
-const int MaxRiceSum = 10 * 10;
+
 int NowHouseSum = 1;
 int NowFieldSum = 1;
 int NowTreeSum = 0;
+int NowRiceSum = 0;
 Object objHouse[MaxHouseSum];
 Object objFarmer;
 Object builder;
 Object objField[MaxFieldSum];
 Object objRice[MaxRiceSum];
 Object objTree[MaxTreeSum];
+
 Object king;
 
 Farmer farmer;
 Field field;
 House house;
 
-int runtime = 0;
 
+float runtime = 0;
+float timeScale = 1;
 int LastFPS = 0;
 
 
@@ -133,8 +133,11 @@ int main()
 	time_t start, stop;
 	start = time(NULL);
 	
+	cout << "Time scale?";
 
-
+	//cin >> timeScale;
+	timeScale = 2;
+	
 	while (1)
 	{
 		KeyControl();
@@ -149,14 +152,14 @@ int main()
 		stop = time(NULL);
 		if (stop - start >= 1)
 		{
-			runtime++;
+			runtime+=timeScale;
 			start = stop;
 			char title[200];
 			sprintf_s(title, "FPS %d ", frame);
 			SetWindowText(screen_handle, title);
 			LastFPS = frame;
 			frame = 0;
-			cout << "run time:" << runtime << endl;
+			//cout << "run time:" << runtime << endl;
 
 		}
 
@@ -164,9 +167,6 @@ int main()
 
 	return 0;
 }
-
-
-
 
 
 

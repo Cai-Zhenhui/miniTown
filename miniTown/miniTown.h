@@ -17,8 +17,9 @@ extern BYTE buffer[SCREEN_WIDTH * SCREEN_HEIGHT * bits / 8];
 //-----------------------------------
 
 
-extern int runtime;
+extern float runtime;
 extern int LastFPS;
+extern float timeScale;
 
 
 class Color
@@ -38,6 +39,22 @@ public:
 	RGBQUAD* pColorTable;//颜色表指针
 	int biBitCount;//图像类型，每像素位数
 };
+extern Picture picLand;
+extern Picture picHouse;
+extern Picture picFarmer;
+extern Picture picBuilder;
+extern Picture picField;
+extern Picture picField1;
+extern Picture picField2;
+extern Picture picTree;
+extern Picture picKing;
+extern Picture picRice;
+
+
+const int MaxHouseSum = 10 * 10;
+const int MaxFieldSum = 10 * 10;
+const int MaxTreeSum = 10 * 10;
+const int MaxRiceSum = 10 * 10;
 
 class Object
 {
@@ -54,13 +71,8 @@ public:
 	int id;
 	float growingTime;
 	Object *DrawObject;
-};
-
-class House
-{
-public:
-	int id;
-	Object *DrawObject;
+	void AddRice();
+	void AI();
 };
 
 class Rice
@@ -70,6 +82,18 @@ public:
 	Object* DrawObject;
 
 };
+
+class House
+{
+public:
+	int id;
+	Object *DrawObject;
+	Object* StoneRice[MaxRiceSum];
+	int StoneRiceSum;
+	
+};
+
+
 
 class Farmer
 {
@@ -82,13 +106,40 @@ public:
 	Object*DrawObject;
 	int wantFoodLevel;
 	int wantSexLevel;
+	Object* TakeOnThing;
+	void WalkTo(Object* object);
+	void GrowRice();
 	void AI();
+	void PutRice();
+};
+
+class Builder
+{
+public:
+	int id;
+	float age;
+	int money;
+	House* belongHouse;
+
 };
 
 
 
+extern int NowHouseSum;
+extern int NowFieldSum;
+extern int NowTreeSum;
+extern int NowRiceSum;
+extern Object objHouse[MaxHouseSum];
+extern Object objFarmer;
+extern Object builder;
+extern Object objField[MaxFieldSum];
+extern Object objRice[MaxRiceSum];
+extern Object objTree[MaxTreeSum];
 
 
+bool ObjectIsRice(Object* object);
+
+bool IsCloseTo(Object* A, Object* B);
 
 void CleanScreen();
 void Draw();
