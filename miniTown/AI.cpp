@@ -37,29 +37,121 @@ void Farmer::GrowRice()
 
 void Farmer::WalkTo(Object* object)
 {
-
-	if (object->x >DrawObject->x)
-	{
-		DrawObject->x += timeScale;
-
-	}
-	else if (object->x < DrawObject->x)
-	{
-		DrawObject->x -= timeScale;
-	}
-	if (object->y > DrawObject->y)
-	{
-		DrawObject->y += timeScale;
-	}
-	else if (object->y < DrawObject->y)
-	{
-		DrawObject->y -= timeScale;
-	}
+	DrawObject->WalkTo(object);
 	if (TakeOnThing != NULL)
 	{
-		TakeOnThing->x = DrawObject->x;
-		TakeOnThing->y = DrawObject->y;
-		TakeOnThing->z = DrawObject->z;
+		TakeOnThing->WalkTo(object);
+	}
+}
+
+void Builder::WalkTo(Object* object)
+{
+	DrawObject->WalkTo(object);
+	if (TakeOnThing != NULL)
+	{
+		TakeOnThing->WalkTo(object);
+	}
+}
+
+Tree* Builder::FindATree()
+{
+	int minDistance=99999999;
+	Tree* ClosesetTree = NULL;
+	for (int i = 0; i < NowTreeSum; i++)
+	{
+		int nowDistance= DistanceAToB(this->DrawObject, tree[i].DrawObject);
+		if (nowDistance < minDistance)
+		{
+			minDistance = nowDistance;
+			ClosesetTree = &tree[i];
+		}
+	}
+	return ClosesetTree;
+}
+
+void Builder::CutTree()
+{
+	if (DrawObject->x + DrawObject->pic->bmpWidth > AimTree->DrawObject->x)
+	{
+		if (DrawObject->x < AimTree->DrawObject->x + AimTree->DrawObject->pic->bmpWidth)
+		{
+			if (DrawObject->y + DrawObject->pic->bmpHeight > AimTree->DrawObject->y)
+			{
+				if (DrawObject->y < AimTree->DrawObject->y + AimTree->DrawObject->pic->bmpHeight)
+				{
+					AimTree->cutTime += (float)1 / (float)LastFPS * timeScale;
+				}
+			}
+		}
+	}
+
+	if (AimTree->cutTime > 15)
+	{
+		AimTree->AddWood();
+		AimTree->cutTime = 0;
+		this->TakeOnThing = &objWood[NowWoodSum - 1];
+	}
+}
+
+void Builder::AI()
+{
+	//白天去种田
+	
+	if ((int)runtime % DayTime < DayTime/2)
+	{
+		if (wantFoodLevel > 0)
+		{
+			if (AimTree == NULL)
+			{
+				AimTree = FindATree();
+			}
+			WalkTo(AimTree->DrawObject);
+			CutTree();
+		}
+	}
+	else
+	{
+		//晚上去睡觉
+		WalkTo(belongHouse->DrawObject);
+		if (IsCloseTo(DrawObject, belongHouse->DrawObject))
+		{
+			if (ObjectIsWood(TakeOnThing))
+			{
+				PutWood();
+			}
+		}
+	}
+
+}
+
+void Builder::PutWood()
+{
+	belongHouse->StoneWood[belongHouse->StoneWoodSum] = TakeOnThing;
+	belongHouse->StoneWoodSum++;
+	std::cout << "Wood In House Sum " << belongHouse->StoneWoodSum << std::endl;
+	RemoveDrawObecjt(TakeOnThing);
+	TakeOnThing = NULL;
+}
+
+void Object::WalkTo(Object* object)
+{
+
+	if (object->x >x)
+	{
+		x += timeScale;
+
+	}
+	else if (object->x < x)
+	{
+		x -= timeScale;
+	}
+	if (object->y > y)
+	{
+		y += timeScale;
+	}
+	else if (object->y < y)
+	{
+		y -= timeScale;
 	}
 }
 
@@ -71,7 +163,7 @@ void Farmer::WalkTo(Object* object)
 void Farmer::AI()
 {
 	//白天去种田
-	if ((int)runtime % 30 < 15)
+	if ((int)runtime % DayTime < DayTime/2)
 	{
 		if (wantFoodLevel > 0)
 		{
@@ -120,4 +212,15 @@ void Field::AddRice()
 	NowRiceSum++;
 
 	AddDrawObject(newObjRice);
+}
+
+void Tree::AddWood()
+{
+	Object* newObjWood = &objWood[NowWoodSum];
+	newObjWood->x = this->DrawObject->x;
+	newObjWood->y = this->DrawObject->y;
+	newObjWood->z = 0;
+	newObjWood->pic = &picWood;
+	NowWoodSum++;
+	AddDrawObject(newObjWood);
 }

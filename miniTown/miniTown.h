@@ -55,6 +55,9 @@ const int MaxHouseSum = 10 * 10;
 const int MaxFieldSum = 10 * 10;
 const int MaxTreeSum = 10 * 10;
 const int MaxRiceSum = 10 * 10;
+const int MaxWoodSum = 10 * 10;
+
+const int DayTime = 30;
 
 class Object
 {
@@ -63,6 +66,7 @@ public:
 	int y;
 	int z;
 	Picture* pic;
+	void WalkTo(Object* object);
 };
 
 class Field
@@ -89,11 +93,20 @@ public:
 	int id;
 	Object *DrawObject;
 	Object* StoneRice[MaxRiceSum];
+	Object* StoneWood[MaxWoodSum];
 	int StoneRiceSum;
+	int StoneWoodSum;
 	
 };
 
-
+class Tree
+{
+public:
+	int id;
+	Object* DrawObject;
+	float cutTime = 0;
+	void AddWood();
+};
 
 class Farmer
 {
@@ -120,26 +133,54 @@ public:
 	float age;
 	int money;
 	House* belongHouse;
-
+	Tree* AimTree=NULL;
+	int wantFoodLevel;
+	int wantSexLevel;
+	Object* DrawObject;
+	Object* TakeOnThing;
+	void WalkTo(Object* object);
+	void BuildHouse(int x, int y);
+	void CutTree();
+	Tree* FindATree();
+	void AI();
+	void PutWood();
 };
 
-
+extern Picture picLand;
+extern Picture picHouse;
+extern Picture picFarmer;
+extern Picture picBuilder;
+extern Picture picField;
+extern Picture picField1;
+extern Picture picField2;
+extern Picture picTree;
+extern Picture picKing;
+extern Picture picRice;
+extern Picture picWood;
 
 extern int NowHouseSum;
 extern int NowFieldSum;
 extern int NowTreeSum;
 extern int NowRiceSum;
+extern int NowWoodSum;
 extern Object objHouse[MaxHouseSum];
 extern Object objFarmer;
-extern Object builder;
+extern Object objBuilder;
 extern Object objField[MaxFieldSum];
 extern Object objRice[MaxRiceSum];
 extern Object objTree[MaxTreeSum];
+extern Object objWood[MaxWoodSum];
+
+extern Field field[MaxFieldSum];
+extern Tree tree[MaxTreeSum];
+
 
 
 bool ObjectIsRice(Object* object);
+bool ObjectIsWood(Object* object);
 
 bool IsCloseTo(Object* A, Object* B);
+float DistanceAToB(Object* A, Object* B);
 
 void CleanScreen();
 void Draw();
@@ -173,13 +214,3 @@ Color loadTexture(double u, double v, Picture* pic);
 Color loadTexture(int x, int y, Picture* pic);
 
 
-extern Picture picLand;
-extern Picture picHouse;
-extern Picture picFarmer;
-extern Picture picBuilder;
-extern Picture picField;
-extern Picture picField1;
-extern Picture picField2;
-extern Picture picTree;
-extern Picture picKing;
-extern Picture picRice;

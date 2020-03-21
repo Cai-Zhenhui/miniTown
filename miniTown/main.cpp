@@ -12,24 +12,32 @@ Picture picField2;
 Picture picTree;
 Picture picKing;
 Picture picRice;
+Picture picWood;
+Picture picSun;
 
 
-int NowHouseSum = 1;
+int NowHouseSum = 2;
 int NowFieldSum = 1;
-int NowTreeSum = 0;
+int NowTreeSum = 1;
 int NowRiceSum = 0;
+int NowWoodSum = 0;
 Object objHouse[MaxHouseSum];
 Object objFarmer;
-Object builder;
+Object objBuilder;
 Object objField[MaxFieldSum];
 Object objRice[MaxRiceSum];
 Object objTree[MaxTreeSum];
+Object objWood[MaxWoodSum];
 
 Object king;
 
+Object objSun;
+
 Farmer farmer;
-Field field;
-House house;
+Builder builder;
+Field field[MaxFieldSum];
+Tree tree[MaxTreeSum];
+House house[2];
 
 
 float runtime = 0;
@@ -49,25 +57,42 @@ void initLoadPic()
 	readBmp("pic/field1.bmp", picField1);
 	readBmp("pic/field2.bmp", picField2);
 	readBmp("pic/rice.bmp", picRice);
+	readBmp("pic/wood.bmp", picWood);
+	readBmp("pic/sun.bmp", picSun);
+	cout << "Load Pic OK!" << endl;
 }
 
 void initObject()
 {
 	farmer.DrawObject = &objFarmer;
-	farmer.belongField = &field;
-	farmer.belongHouse = &house;
+	farmer.belongField = &field[0];
+	farmer.belongHouse = &house[0];
 	farmer.age = 18;
 	farmer.monney = 10;
 	farmer.wantFoodLevel = 1;
 	farmer.wantSexLevel = 1;
 	
-	field.DrawObject = &objField[0];
-	field.id = 0;
-	field.growingTime = 0;
-	
-	house.DrawObject = &objHouse[0];
-	house.id = 0;
+	field[0].DrawObject = &objField[0];
+	field[0].id = 0;
+	field[0].growingTime = 0;
 
+	tree[0].DrawObject = &objTree[0];
+	tree[0].id = 0;
+
+
+	builder.DrawObject = &objBuilder;
+	builder.belongHouse = &house[1];
+	builder.age = 18;
+	builder.money = 10;
+	builder.wantFoodLevel = 1;
+	builder.wantSexLevel = 1;
+
+	
+	
+	house[0].DrawObject = &objHouse[0];
+	house[0].id = 0;
+	house[1].DrawObject = &objHouse[1];
+	house[1].id = 1;
 
 
 	srand(time(NULL));
@@ -101,6 +126,16 @@ void initObject()
 	objFarmer.y = 300;
 	objFarmer.pic = &picFarmer;
 	AddDrawObject(&objFarmer);
+
+	objBuilder.x = 400;
+	objBuilder.y = 400;
+	objBuilder.pic = &picBuilder;
+	AddDrawObject(&objBuilder);
+
+	objSun.pic = &picSun;
+	objSun.x = 0;
+	objSun.y = 0;
+	AddDrawObject(&objSun);
 	/*
 	builder.x = 400;
 	builder.y = 400;
@@ -133,7 +168,7 @@ int main()
 	time_t start, stop;
 	start = time(NULL);
 	
-	cout << "Time scale?";
+	//cout << "Time scale?";
 
 	//cin >> timeScale;
 	timeScale = 2;
@@ -147,12 +182,15 @@ int main()
 		Sleep(1);
 
 		farmer.AI();
+		builder.AI();
 
 		frame++;
 		stop = time(NULL);
 		if (stop - start >= 1)
 		{
 			runtime+=timeScale;
+			objSun.x = ((int)runtime % DayTime)*SCREEN_WIDTH/DayTime;
+			
 			start = stop;
 			char title[200];
 			sprintf_s(title, "FPS %d ", frame);
