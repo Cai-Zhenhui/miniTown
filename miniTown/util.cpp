@@ -62,3 +62,16 @@ float DistanceAToB(Object* A, Object* B)
 		(A->y+A->pic->bmpHeight/2 - (B->y+B->pic->bmpHeight/2)) * (A->y + A->pic->bmpHeight / 2 - (B->y + B->pic->bmpHeight / 2)));
 	return distance;
 }
+
+void AddUnFinishHouse(int x, int y)
+{
+	house[NowHouseSum].buildTime = 0;
+	house[NowHouseSum].DrawObject = &objHouse[NowHouseSum];
+	house[NowHouseSum].DrawObject->pic = &picHouse1;
+	house[NowHouseSum].id = NowHouseSum - 1;
+	house[NowHouseSum].DrawObject->x = x *  picHouse.bmpWidth;
+	house[NowHouseSum].DrawObject->y = y * picHouse.bmpHeight;
+	AddDrawObject(house[NowHouseSum].DrawObject);
+	NowHouseSum++;
+	
+}

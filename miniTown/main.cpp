@@ -4,6 +4,7 @@ using namespace std;
 
 Picture picLand;
 Picture picHouse;
+Picture picHouse1;
 Picture picFarmer;
 Picture picBuilder;
 Picture picField;
@@ -29,6 +30,7 @@ Object objRice[MaxRiceSum];
 Object objTree[MaxTreeSum];
 Object objWood[MaxWoodSum];
 
+
 Object king;
 
 Object objSun;
@@ -37,7 +39,7 @@ Farmer farmer;
 Builder builder;
 Field field[MaxFieldSum];
 Tree tree[MaxTreeSum];
-House house[2];
+House house[MaxHouseSum];
 
 
 float runtime = 0;
@@ -49,6 +51,7 @@ void initLoadPic()
 {
 	readBmp("pic/land.bmp", picLand);
 	readBmp("pic/house.bmp", picHouse);
+	readBmp("pic/house1.bmp", picHouse1);
 	readBmp("pic/farmer.bmp", picFarmer);
 	readBmp("pic/builder.bmp", picBuilder);
 	readBmp("pic/field.bmp", picField);
@@ -91,14 +94,24 @@ void initObject()
 	
 	house[0].DrawObject = &objHouse[0];
 	house[0].id = 0;
+	house[0].buildTime = house[0].RequireBuildTime;
 	house[1].DrawObject = &objHouse[1];
 	house[1].id = 1;
+	house[1].buildTime = house[1].RequireBuildTime;
 
+	
 
 	srand(time(NULL));
 	for (int i = 0; i < NowHouseSum; i++)
 	{
-		objHouse[i].pic = &picHouse;
+		if (house[i].buildTime == house[i].RequireBuildTime)
+		{
+			objHouse[i].pic = &picHouse;
+		}
+		else
+		{
+			objHouse[i].pic = &picHouse1;
+		}
 		objHouse[i].x = (rand()%10)*objHouse[i].pic->bmpWidth;
 		objHouse[i].y = (rand() % 10) * objHouse[i].pic->bmpHeight;
 		
@@ -136,6 +149,8 @@ void initObject()
 	objSun.x = 0;
 	objSun.y = 0;
 	AddDrawObject(&objSun);
+
+	AddUnFinishHouse(5, 5);
 	/*
 	builder.x = 400;
 	builder.y = 400;
@@ -183,6 +198,7 @@ int main()
 
 		farmer.AI();
 		builder.AI();
+		
 
 		frame++;
 		stop = time(NULL);

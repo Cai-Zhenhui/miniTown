@@ -91,6 +91,8 @@ class House
 {
 public:
 	int id;
+	float buildTime=0;
+	const int RequireBuildTime = 30;
 	Object *DrawObject;
 	Object* StoneRice[MaxRiceSum];
 	Object* StoneWood[MaxWoodSum];
@@ -134,20 +136,24 @@ public:
 	int money;
 	House* belongHouse;
 	Tree* AimTree=NULL;
+	House* AimUnFinishHouse = NULL;
 	int wantFoodLevel;
 	int wantSexLevel;
+	int buildTime = 0;
 	Object* DrawObject;
 	Object* TakeOnThing;
 	void WalkTo(Object* object);
-	void BuildHouse(int x, int y);
+	void BuildHouse();
 	void CutTree();
 	Tree* FindATree();
+	House* FindAUnFinishHouse();
 	void AI();
 	void PutWood();
 };
 
 extern Picture picLand;
 extern Picture picHouse;
+extern Picture picHouse1;
 extern Picture picFarmer;
 extern Picture picBuilder;
 extern Picture picField;
@@ -173,6 +179,7 @@ extern Object objWood[MaxWoodSum];
 
 extern Field field[MaxFieldSum];
 extern Tree tree[MaxTreeSum];
+extern House house[MaxHouseSum];
 
 
 
@@ -191,6 +198,8 @@ void AddDrawObject(Object* object);
 void RemoveDrawObecjt(Object* object);
 void DrawPoint(int &x, int &y, const Color &color );
 void DrawPoint(int& x, int& y, int& r, int& g, int& b);
+
+void AddUnFinishHouse(int x, int y);
 
 int screen_init(int w, int h, const TCHAR* title);
 int screen_close(void);

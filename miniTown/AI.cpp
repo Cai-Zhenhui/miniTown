@@ -53,6 +53,8 @@ void Builder::WalkTo(Object* object)
 	}
 }
 
+
+
 Tree* Builder::FindATree()
 {
 	int minDistance=99999999;
@@ -69,6 +71,26 @@ Tree* Builder::FindATree()
 	return ClosesetTree;
 }
 
+House* Builder::FindAUnFinishHouse()
+{
+	int minDistance = 99999999;
+	House* ClossestHouse = NULL;
+	for (int i = 0; i < NowHouseSum; i++)
+	{
+		if (house[i].buildTime < house[i].RequireBuildTime)
+		{
+			int nowDistance = DistanceAToB(this->DrawObject, house[i].DrawObject);
+			if (nowDistance < minDistance)
+			{
+				minDistance = nowDistance;
+				ClossestHouse = &house[i];
+			}
+		}
+		
+	}
+	return ClossestHouse;
+}
+
 void Builder::CutTree()
 {
 	if (DrawObject->x + DrawObject->pic->bmpWidth > AimTree->DrawObject->x)
@@ -80,6 +102,7 @@ void Builder::CutTree()
 				if (DrawObject->y < AimTree->DrawObject->y + AimTree->DrawObject->pic->bmpHeight)
 				{
 					AimTree->cutTime += (float)1 / (float)LastFPS * timeScale;
+					std::cout << AimTree->cutTime << std::endl;
 				}
 			}
 		}
@@ -90,13 +113,30 @@ void Builder::CutTree()
 		AimTree->AddWood();
 		AimTree->cutTime = 0;
 		this->TakeOnThing = &objWood[NowWoodSum - 1];
+		
+	}
+}
+
+void Builder::BuildHouse()
+{
+	
+	if (IsCloseTo(this->DrawObject, AimUnFinishHouse->DrawObject) == true)
+	{
+		AimUnFinishHouse->buildTime += (float)1 / (float)LastFPS * timeScale;
+		std::cout << AimUnFinishHouse->buildTime << std::endl;
+	}
+	
+	if (AimUnFinishHouse->buildTime > house->RequireBuildTime)
+	{
+		AimUnFinishHouse->buildTime = AimUnFinishHouse->RequireBuildTime;
+		AimUnFinishHouse->DrawObject->pic = &picHouse;
+		AimUnFinishHouse = NULL;
 	}
 }
 
 void Builder::AI()
 {
-	//白天去种田
-	
+	//白天去砍树或种田
 	if ((int)runtime % DayTime < DayTime/2)
 	{
 		if (wantFoodLevel > 0)
@@ -105,8 +145,22 @@ void Builder::AI()
 			{
 				AimTree = FindATree();
 			}
-			WalkTo(AimTree->DrawObject);
-			CutTree();
+			if (AimUnFinishHouse == NULL)
+			{
+				AimUnFinishHouse = FindAUnFinishHouse();
+			}
+			if (belongHouse->StoneWoodSum > 0&&AimUnFinishHouse!=NULL)
+			{
+
+				WalkTo(AimUnFinishHouse->DrawObject);
+				BuildHouse();
+
+			}
+			else
+			{
+				WalkTo(AimTree->DrawObject);
+				CutTree();
+			}
 		}
 	}
 	else
@@ -128,7 +182,7 @@ void Builder::PutWood()
 {
 	belongHouse->StoneWood[belongHouse->StoneWoodSum] = TakeOnThing;
 	belongHouse->StoneWoodSum++;
-	std::cout << "Wood In House Sum " << belongHouse->StoneWoodSum << std::endl;
+	std::cout << "Wood In House No." <<belongHouse->id<<" Sum " << belongHouse->StoneWoodSum << std::endl;
 	RemoveDrawObecjt(TakeOnThing);
 	TakeOnThing = NULL;
 }
@@ -192,7 +246,8 @@ void Farmer::PutRice()
 {
 	belongHouse->StoneRice[belongHouse->StoneRiceSum] = TakeOnThing;
 	belongHouse->StoneRiceSum++;
-	std::cout << "Rice In House Sum " << belongHouse->StoneRiceSum <<std:: endl;
+	
+	std::cout << "Rice In House No." << belongHouse->id << " Sum "  << belongHouse->StoneRiceSum <<std:: endl;
 	RemoveDrawObecjt(TakeOnThing);
 	TakeOnThing = NULL;
 }
