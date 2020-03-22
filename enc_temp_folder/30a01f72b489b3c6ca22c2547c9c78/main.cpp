@@ -70,6 +70,7 @@ void initLoadPic()
 
 void initObject()
 {
+	
 	AddField(0, 1);
 	AddField(0, 4);
 	AddTree(0, 0);
@@ -88,6 +89,17 @@ void initObject()
 	AddDrawObject(&objSun);
 
 	AddUnFinishHouse(5, 5);
+	/*
+	builder.x = 400;
+	builder.y = 400;
+	builder.pic = &picBuilder;
+	AddDrawObject(&builder);
+
+	king.x = 500;
+	king.y = 500;
+	king.pic = &picKing;
+	AddDrawObject(&king);
+	*/
 }
 
 int main()
@@ -122,7 +134,8 @@ int main()
 		
 		Sleep(1);
 
-		AILoop();
+		farmer[0].AI();
+		builder[0].AI();
 		
 
 		frame++;

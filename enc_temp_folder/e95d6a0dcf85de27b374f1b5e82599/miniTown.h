@@ -186,8 +186,7 @@ extern Farmer farmer[MaxFarmerSum];
 extern Builder builder[MaxBuilderSum];
 
 
-//======================================================
-// 游戏引擎部分
+
 void CleanScreen();
 void Draw();
 extern Object* drawList[1000];
@@ -197,7 +196,6 @@ void AddDrawObject(Object* object);
 void RemoveDrawObecjt(Object* object);
 void DrawPoint(int &x, int &y, const Color &color );
 void DrawPoint(int& x, int& y, int& r, int& g, int& b);
-void 
 
 
 
@@ -222,9 +220,7 @@ void DrawBmp(int x, int y, Picture* pic);
 Color loadTexture(double u, double v, Picture* pic);
 Color loadTexture(int x, int y, Picture* pic);
 
-//--------------------------------
-// AI
-void AILoop();
+
 
 //--------------------------------
 //游戏机制

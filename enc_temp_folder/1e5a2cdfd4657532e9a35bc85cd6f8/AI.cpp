@@ -1,17 +1,5 @@
 #include"miniTown.h"
 
-void AILoop()
-{
-	for (int i = 0; i < NowBuilderSum; i++)
-	{
-		builder[i].AI();
-	}
-	for (int i = 0; i < NowFarmerSum; i++)
-	{
-		farmer[i].AI();
-	}
-}
-
 void Farmer::GrowRice()
 {
 	if (DrawObject->x + DrawObject->pic->bmpWidth > belongField->DrawObject->x)
