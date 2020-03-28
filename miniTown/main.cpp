@@ -15,6 +15,10 @@ Picture picKing;
 Picture picRice;
 Picture picWood;
 Picture picSun;
+Picture picBackground;
+Picture picBackground1;
+Picture picMoon;
+Picture picKingHouse;
 
 
 int NowHouseSum = 0;
@@ -31,18 +35,20 @@ Object objField[MaxFieldSum];
 Object objRice[MaxRiceSum];
 Object objTree[MaxTreeSum];
 Object objWood[MaxWoodSum];
+Object objBackground;
 
-
-
-Object king;
+Object objKing;
 
 Object objSun;
+Object objMoon;
 
 Farmer farmer[MaxFarmerSum];
 Builder builder[MaxBuilderSum];
+King king;
 Field field[MaxFieldSum];
 Tree tree[MaxTreeSum];
 House house[MaxHouseSum];
+
 
 
 float runtime = 0;
@@ -65,29 +71,53 @@ void initLoadPic()
 	readBmp("pic/rice.bmp", picRice);
 	readBmp("pic/wood.bmp", picWood);
 	readBmp("pic/sun.bmp", picSun);
+	readBmp("pic/background.bmp", picBackground);
+	readBmp("pic/background1.bmp", picBackground1);
+	readBmp("pic/moon.bmp", picMoon);
+	readBmp("pic/kinghouse.bmp", picKingHouse);
 	cout << "Load Pic OK!" << endl;
 }
 
 void initObject()
 {
-	AddField(0, 1);
-	AddField(0, 4);
-	AddTree(0, 0);
-	
-	AddFinishHouse(1, 1);
-	AddFinishHouse(1, 2);
-	
 	srand(time(NULL));
+	for (int i = 1; i < 4; i++)
+	{
+		AddField(1, i);
+		AddFinishHouse(2, i);
+		AddFarmer(2, i);
+		
+	}
 
-	AddFarmer(2, 3);
-	AddBuilder(4, 4);
+	for (int i = 1; i < 2; i++)
+	{
+		AddTree(3, i);
+		AddFinishHouse(4, i);
+		AddBuilder(4, i);
+		AddUnFinishHouse(5, i);
+	}
+
+
+	AddFinishHouse(8, 2,1);
+	AddKing(8, 2);
+
+
+	objBackground.pic = &picBackground;
+	objBackground.x = 0;
+	objBackground.y = 0;
+	AddDrawObject(&objBackground);
 
 	objSun.pic = &picSun;
 	objSun.x = 0;
 	objSun.y = 0;
 	AddDrawObject(&objSun);
 
-	AddUnFinishHouse(5, 5);
+	objMoon.pic = &picMoon;
+	objMoon.x = -objMoon.pic->Width;
+	AddDrawObject(&objMoon);
+
+
+
 }
 
 int main()
@@ -123,14 +153,14 @@ int main()
 		Sleep(1);
 
 		AILoop();
+		ShowSky();
 		
-
 		frame++;
 		stop = time(NULL);
 		if (stop - start >= 1)
 		{
 			runtime+=timeScale;
-			objSun.x = ((int)runtime % DayTime)*SCREEN_WIDTH/DayTime;
+
 			
 			start = stop;
 			char title[200];
@@ -152,24 +182,38 @@ int main()
 
 void KeyControl()
 {
+	static int pressL = false;
 	if (screen_keys[VK_ESCAPE])
 	{
 		exit(1);		//正常结束
 	}
-	if (screen_keys['W'])
+	 if (screen_keys['W'])
 	{
-		objFarmer[0].y--;
+		king.DrawObject->y--;
 	}
 	if (screen_keys['S'])
 	{
-		objFarmer[0].y++;
+		king.DrawObject->y++;
 	}
 	if (screen_keys['A'])
 	{
-		objFarmer[0].x--;
+		king.DrawObject->x--;
 	}
 	if (screen_keys['D'])
 	{
-		objFarmer[0].x++;
+		king.DrawObject->x++;
 	}
+	if (screen_keys['L'])  //list 显示当前村民资源
+	{
+		if (pressL == false)
+		{
+			ResourceCount();
+		}
+		pressL = true;
+	}
+	else
+	{
+		pressL = false;
+	}
+
 }

@@ -10,20 +10,30 @@ void AILoop()
 	{
 		farmer[i].AI();
 	}
+	king.AI();
 }
 
 void Farmer::GrowRice()
 {
-	if (DrawObject->x + DrawObject->pic->bmpWidth > belongField->DrawObject->x)
+	if (DrawObject->x + DrawObject->pic->Width > belongField->DrawObject->x)
 	{
-		if (DrawObject->x < belongField->DrawObject->x + belongField->DrawObject->pic->bmpWidth)
+		if (DrawObject->x < belongField->DrawObject->x + belongField->DrawObject->pic->Width)
 		{
-			if (DrawObject->y + DrawObject->pic->bmpHeight > belongField->DrawObject->y)
+			if (DrawObject->y + DrawObject->pic->Height > belongField->DrawObject->y)
 			{
-				if (DrawObject->y < belongField->DrawObject->y + belongField->DrawObject->pic->bmpHeight)
+				if (DrawObject->y < belongField->DrawObject->y + belongField->DrawObject->pic->Height)
 				{
-					belongField->growingTime += (float)1 / (float)LastFPS * timeScale;
-				}
+					if (LastFPS != 0)
+					{
+						belongField->growingTime += (float)1 / (float)LastFPS * timeScale;
+						if (DebugShowGrowTimeFlag)
+						{
+							std::cout << "Farmer No." << this->id << " grow time " << this->belongField->growingTime << std::endl;
+
+						}
+
+					}
+	}
 			}
 		}
 	}
@@ -105,15 +115,23 @@ House* Builder::FindAUnFinishHouse()
 
 void Builder::CutTree()
 {
-	if (DrawObject->x + DrawObject->pic->bmpWidth > AimTree->DrawObject->x)
+	if (DrawObject->x + DrawObject->pic->Width > AimTree->DrawObject->x)
 	{
-		if (DrawObject->x < AimTree->DrawObject->x + AimTree->DrawObject->pic->bmpWidth)
+		if (DrawObject->x < AimTree->DrawObject->x + AimTree->DrawObject->pic->Width)
 		{
-			if (DrawObject->y + DrawObject->pic->bmpHeight > AimTree->DrawObject->y)
+			if (DrawObject->y + DrawObject->pic->Height > AimTree->DrawObject->y)
 			{
-				if (DrawObject->y < AimTree->DrawObject->y + AimTree->DrawObject->pic->bmpHeight)
+				if (DrawObject->y < AimTree->DrawObject->y + AimTree->DrawObject->pic->Height)
 				{
-					AimTree->cutTime += (float)1 / (float)LastFPS * timeScale;
+					if (LastFPS != 0)
+					{
+						AimTree->cutTime += (float)1 / (float)LastFPS * timeScale;
+					}
+					if (DebugShowGrowTimeFlag)
+					{
+						std::cout << "Builder No." << this->id << " cut tree take time " << this->AimTree->cutTime << std::endl;
+
+					}
 					//std::cout << AimTree->cutTime << std::endl;
 				}
 			}
@@ -125,6 +143,7 @@ void Builder::CutTree()
 		AimTree->AddWood();
 		AimTree->cutTime = 0;
 		this->TakeOnThing = &objWood[NowWoodSum - 1];
+		std::cout << "Builder No." << this->id << " take wood!" << std:: endl;
 		
 	}
 }
@@ -144,6 +163,7 @@ void Builder::BuildHouse()
 		AimUnFinishHouse->buildTime = AimUnFinishHouse->RequireBuildTime;
 		AimUnFinishHouse->DrawObject->pic = &picHouse;
 		AimUnFinishHouse = NULL;
+		belongHouse->StoneWoodSum -= 3;
 	}
 }
 
@@ -162,7 +182,7 @@ void Builder::AI()
 			{
 				AimUnFinishHouse = FindAUnFinishHouse();
 			}
-			if (belongHouse->StoneWoodSum > 0&&AimUnFinishHouse!=NULL)
+			if (belongHouse->StoneWoodSum >= 3&&AimUnFinishHouse!=NULL)
 			{
 
 				WalkTo(AimUnFinishHouse->DrawObject);
@@ -171,8 +191,12 @@ void Builder::AI()
 			}
 			else
 			{
-				WalkTo(AimTree->DrawObject);
-				CutTree();
+				if (AimTree != NULL)
+				{
+					WalkTo(AimTree->DrawObject);
+					CutTree();
+				}
+				
 			}
 		}
 	}
@@ -224,9 +248,6 @@ void Object::WalkTo(Object* object)
 
 
 
-
-
-
 void Farmer::AI()
 {
 	//°×ÌìÈ¥ÖÖÌï
@@ -260,7 +281,10 @@ void Farmer::PutRice()
 	belongHouse->StoneRice[belongHouse->StoneRiceSum] = TakeOnThing;
 	belongHouse->StoneRiceSum++;
 	
-	std::cout << "Rice In House No." << belongHouse->id << " Sum "  << belongHouse->StoneRiceSum <<std:: endl;
+	if (DebugShowGrowTimeFlag)
+	{
+		std::cout << "Rice In House No." << belongHouse->id << " Sum " << belongHouse->StoneRiceSum << std::endl;
+	}
 	RemoveDrawObecjt(TakeOnThing);
 	TakeOnThing = NULL;
 }
@@ -278,7 +302,7 @@ void Field::AddRice()
 	newObjRice->z = 0;
 	newObjRice->pic = &picRice;
 	NowRiceSum++;
-
+	std::cout << "Add Rice Called!" << std::endl;
 	AddDrawObject(newObjRice);
 }
 
@@ -291,4 +315,9 @@ void Tree::AddWood()
 	newObjWood->pic = &picWood;
 	NowWoodSum++;
 	AddDrawObject(newObjWood);
+}
+
+void King::AI()
+{
+
 }

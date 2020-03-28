@@ -124,10 +124,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
-    <ClCompile Include="Draw.cpp" />
-    <ClCompile Include="LoadBMP.cpp" />
+    <ClCompile Include="Engine.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="util.cpp" />
+    <ClCompile Include="gameplay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="miniTown.h" />
