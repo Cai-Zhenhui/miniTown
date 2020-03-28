@@ -231,7 +231,6 @@ void AddField(int x, int y)
 
 	AddDrawObject(&objField[NowFieldSum]);
 	NowFieldSum++;
-
 }
 
 
@@ -282,4 +281,9 @@ void ShowSky()
 	{
 		objBackground.pic = &picBackground;
 	}
+}
+
+House* FindKingHouse()
+{
+	return king.belongHouse;
 }

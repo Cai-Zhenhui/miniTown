@@ -183,6 +183,10 @@ int main()
 void KeyControl()
 {
 	static int pressL = false;
+	static int pressR = false;
+	static int pressH = false;
+	static int pressM = false;
+	static int pressN = false;
 	if (screen_keys[VK_ESCAPE])
 	{
 		exit(1);		//Õý³£½áÊø
@@ -214,6 +218,66 @@ void KeyControl()
 	else
 	{
 		pressL = false;
+	}
+	if (screen_keys['R'])
+	{
+		if (pressR == false)
+		{
+			cout << "Enter Rice Price:";
+			int price;
+			cin >> price;
+			king.SetRicePrice(price);
+		}
+		pressR = true;
+	}
+	else
+	{
+		pressR = false;
+	}
+	if (screen_keys['H'])
+	{
+		if (pressH == false)
+		{
+			cout << "Enter House Price:";
+			int price;
+			cin >> price;
+			king.SetHousePrice(price);
+		}
+		pressH = true;
+	}
+	else
+	{
+		pressH = false;
+	}
+	if (screen_keys['M'])
+	{
+		if (pressM == false)
+		{
+			cout << "Enter Sum of the Money Add:";
+			int sum;
+			cin >> sum;
+			king.MakeMoney(sum);
+		}
+		pressM = true;
+	}
+	else
+	{
+		pressM = false;
+	}
+	if (screen_keys['N'])
+	{
+		if (pressN == false)
+		{
+			cout << "Enter Sum of the Money Destory:";
+			int sum;
+			cin >> sum;
+			king.DestoryMoney(sum);
+		}
+		pressN = true;
+	}
+	else
+	{
+		pressN = false;
 	}
 
 }

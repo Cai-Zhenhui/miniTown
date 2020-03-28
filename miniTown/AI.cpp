@@ -1,4 +1,6 @@
 #include"miniTown.h"
+int RicePrice=3;
+int HousePrice=10;
 
 void AILoop()
 {
@@ -250,13 +252,28 @@ void Object::WalkTo(Object* object)
 
 void Farmer::AI()
 {
+	House* kingHouse = FindKingHouse();
 	//白天去种田
 	if ((int)runtime % DayTime < DayTime/2)
 	{
 		if (wantFoodLevel > 0)
 		{
+			//如果有一个水稻就拿去卖
+			if (belongHouse->StoneRiceSum > 0)
+			{
+				
+				TakeOnThing = belongHouse->StoneRice[belongHouse->StoneRiceSum - 1];
+				WalkTo(kingHouse->DrawObject);
+				if (IsCloseTo(DrawObject, kingHouse->DrawObject))
+				{
+					
+				}
+
+
+			}
 			
 			WalkTo(belongField->DrawObject);
+			
 			GrowRice();
 		}
 	}
@@ -272,8 +289,6 @@ void Farmer::AI()
 			}
 		}
 	}
-	
-	
 }
 
 void Farmer::PutRice()
@@ -320,4 +335,28 @@ void Tree::AddWood()
 void King::AI()
 {
 
+}
+
+void King::MakeMoney(int Sum)
+{
+	this->monney += Sum;
+}
+
+void King::DestoryMoney(int Sum)
+{
+	this->monney -= Sum;
+	if (this->monney < 0)
+	{
+		this->monney = 0;
+	}
+}
+
+void King::SetRicePrice(int Price)
+{
+	RicePrice = Price;
+}
+
+void King::SetHousePrice(int Price)
+{
+	HousePrice = Price;
 }

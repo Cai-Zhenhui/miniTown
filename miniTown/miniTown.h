@@ -97,6 +97,7 @@ extern int LastFPS;
 extern float timeScale;
 
 
+
 const int MaxHouseSum = 10 * 10;
 const int MaxFieldSum = 10 * 10;
 const int MaxFarmerSum = 10 * 10;
@@ -104,6 +105,9 @@ const int MaxBuilderSum = 10 * 10;
 const int MaxTreeSum = 10 * 10;
 const int MaxRiceSum = 10 * 10;
 const int MaxWoodSum = 10 * 10;
+
+extern int RicePrice;
+extern int HousePrice;
 
 class Field
 {
@@ -137,6 +141,8 @@ public:
 	Object* StoneWood[MaxWoodSum];
 	int StoneRiceSum;
 	int StoneWoodSum;
+	void RiceToMoney();
+	void HouseToMoney();
 	
 };
 
@@ -165,6 +171,7 @@ public:
 	void GrowRice();
 	void AI();
 	void PutRice();
+	
 	
 };
 
@@ -204,9 +211,11 @@ public:
 	Object* TakeOnThing;
 	void WalkTo(Object* object);
 	
-	void GrowRice();
 	void AI();
-	void PutRice();
+	void MakeMoney(int Sum);
+	void DestoryMoney(int Sum);
+	void SetRicePrice(int Price);
+	void SetHousePrice(int Price);
 };
 
 
@@ -285,3 +294,4 @@ bool IsCloseTo(Object* A, Object* B);  //判断两个Object是否靠近
 float DistanceAToB(Object* A, Object* B);
 House* GetANearEmptyHouse(Object* man,int type=0); 
 Field* GetANearUnUsedField(Object* man);
+House* FindKingHouse();
