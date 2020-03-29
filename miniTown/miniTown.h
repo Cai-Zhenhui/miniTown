@@ -111,10 +111,16 @@ const int MaxBuilderSum = 10 * 10;
 const int MaxTreeSum = 10 * 10;
 const int MaxRiceSum = 10 * 10;
 const int MaxWoodSum = 10 * 10;
+const int MaxObjectSum = 10 * 10;
 
+
+extern int FieldProduceRiceSum;
 extern int RicePrice;
 extern int HousePrice;
 extern int FirstPayHousePrice; //盖房子预先给木匠的定金
+
+extern float DayTimeNow; //今天的进度(0~1)
+extern int DaySum; 
 
 class Field
 {
@@ -173,13 +179,20 @@ public:
 	Object*DrawObject;
 	int wantFoodLevel;
 	int wantSexLevel;
-	Object* TakeOnThing;
+	Object* TakeOnThing[MaxObjectSum];
+	int TakeOnThingSum = 0;
 	void WalkTo(Object* object);
+	void Eat();
+	void Sleep();
 	void GrowRice();
 	void AI();
 	void PutRice();
+	void GetARiceToHand();  //从房子里拿出一个水稻到手上
+	void GetAllRiceToHand(); //从房子里拿出所有水稻到手上
+
 	bool SellRiceForMoney();
 
+	int LastDaySum=0; //用来计算食欲的临时变量
 	
 };
 

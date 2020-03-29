@@ -53,6 +53,8 @@ House house[MaxHouseSum];
 
 
 float runtime = 0;
+float DayTimeNow = 0; //今天的进度(0~1)
+int DaySum = 0; //经过的日子数量
 float timeScale = 1;
 int LastFPS = 0;
 
@@ -163,6 +165,9 @@ int main()
 		{
 			runtime+=timeScale;
 			clkClick = true;
+			DayTimeNow = (float)((int)runtime % DayTime) / DayTime;
+			DaySum = (int)runtime / DayTime;
+			cout << DaySum << endl;
 			
 			start = stop;
 			char title[200];

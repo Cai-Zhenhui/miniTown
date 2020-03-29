@@ -285,16 +285,16 @@ void ResourceCount()//对村民拥有的资源进行统计
 	cout << endl;
 
 	cout << "Farmer:" << endl;
-	cout << "id\tmonney\tage\triceCount" << endl;
+	cout << "id\tmonney\tage\trice\twantFood\twantSex" << endl;
 	for (int i = 0; i < NowFarmerSum; i++)
 	{
-		cout << farmer[i].id << "\t" << farmer[i].monney << "\t" << farmer[i].age<<"\t"<<farmer[i].belongHouse->StoneRiceSum << endl;
+		cout << farmer[i].id << "\t" << farmer[i].monney << "\t" << farmer[i].age<<"\t"<<farmer[i].belongHouse->StoneRiceSum<<"\t"<<farmer[i].wantFoodLevel<<"\t"<<farmer[i].wantSexLevel << endl;
 	}
 	cout << "Builder:" << endl;
-	cout << "id\tmonney\tage\tHouse\tWood" << endl;
+	cout << "id\tmonney\tage\tHouse\tWood\twantFood\twantSex" << endl;
 	for (int i = 0; i < NowBuilderSum; i++)
 	{
-		cout << builder[i].id << "\t" << builder[i].money << "\t" << builder[i].age<<"\t"<<builder[i].OwnHouseCount<<"\t"<<builder[i].belongHouse->StoneWoodSum << endl;
+		cout << builder[i].id << "\t" << builder[i].money << "\t" << builder[i].age<<"\t"<<builder[i].OwnHouseCount<<"\t"<<builder[i].belongHouse->StoneWoodSum<<"\t"<<builder[i].wantFoodLevel<<"\t"<<builder[i].wantSexLevel << endl;
 	}
 	cout << "King:" << endl;
 	cout << "monney\tage\tHouse\tRice" << endl;

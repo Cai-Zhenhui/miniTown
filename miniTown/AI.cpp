@@ -3,6 +3,7 @@ using namespace std;
 int RicePrice=3;
 int HousePrice=10;
 int FirstPayHousePrice = 10;
+int FieldProduceRiceSum = 10;
 
 void AILoop()
 {
@@ -40,7 +41,7 @@ void Farmer::GrowRice()
 						}
 
 					}
-	}
+				}
 			}
 		}
 	}
@@ -58,21 +59,53 @@ void Farmer::GrowRice()
 	}
 	else if (belongField->growingTime < 30)
 	{
-		belongField->AddRice();
+		for (int i = 0; i < FieldProduceRiceSum; i++)
+		{
+			belongField->AddRice();		
+			TakeOnThing[TakeOnThingSum] = &objRice[NowRiceSum - 1];
+			TakeOnThingSum++;
+		}
 		belongField->growingTime = 0;
-		TakeOnThing= &objRice[NowRiceSum-1];
+
 	}
 }
 
 void Farmer::WalkTo(Object* object)
 {
 	DrawObject->WalkTo(object);
-	if (TakeOnThing != NULL)
+
+	for (int i = 0; i < TakeOnThingSum; i++)
 	{
-		TakeOnThing->x = this->DrawObject->x;
-		TakeOnThing->y = this->DrawObject->y;
-		//TakeOnThing->WalkTo(object);
+		if (TakeOnThing[i] != NULL)
+		{
+			TakeOnThing[i]->x = this->DrawObject->x;
+			TakeOnThing[i]->y = this->DrawObject->y;
+		}
 	}
+}
+//吃一个水稻回复一个食欲水平
+void Farmer::Eat()
+{
+	if (wantFoodLevel > 0&&belongHouse->StoneRiceSum>0)
+	{
+		belongHouse->StoneRiceSum--;
+		wantFoodLevel--;
+	}
+}
+
+void Farmer::Sleep()
+{
+	if (clkClick)
+	{
+		if (DaySum > LastDaySum)
+		{
+			wantFoodLevel++;
+			cout << "want food level update " << wantFoodLevel << endl;
+			LastDaySum = DaySum;
+		}
+		
+	}
+
 }
 
 void Builder::WalkTo(Object* object)
@@ -238,8 +271,10 @@ void Builder::AI()
 	{
 		//晚上去睡觉
 		WalkTo(belongHouse->DrawObject);
+		//到家了
 		if (IsCloseTo(DrawObject, belongHouse->DrawObject))
 		{
+			
 			if (ObjectIsWood(TakeOnThing))
 			{
 				PutWood();
@@ -310,14 +345,31 @@ void Farmer::AI()
 			//如果有一个水稻就拿去卖
 			if (belongHouse->StoneRiceSum > 0)
 			{
+				cout << "take On thing sum " << TakeOnThingSum << endl;
+				//从房子里拿一个水稻来卖
 				
-				TakeOnThing = belongHouse->StoneRice[belongHouse->StoneRiceSum - 1];
-				AddDrawObject(TakeOnThing);
-				WalkTo(kingHouse->DrawObject);
-				if (IsCloseTo(DrawObject, kingHouse->DrawObject))
+				if (TakeOnThingSum == 0)
 				{
-					SellRiceForMoney();
+					if (IsCloseTo(DrawObject, belongHouse->DrawObject))
+					{
+						GetARiceToHand();
+					}
+					WalkTo(belongHouse->DrawObject);
+					
 				}
+
+				
+				//如果拿到水稻就拿去卖
+				if (TakeOnThingSum > 0)
+				{
+					AddDrawObject(TakeOnThing[TakeOnThingSum - 1]);
+					WalkTo(kingHouse->DrawObject);
+					if (IsCloseTo(DrawObject, kingHouse->DrawObject))
+					{
+						SellRiceForMoney();
+					}
+				}
+
 			}
 			else
 			{
@@ -332,37 +384,66 @@ void Farmer::AI()
 	{
 		//晚上去睡觉
 		WalkTo(belongHouse->DrawObject);
+		//到家了
 		if (IsCloseTo(DrawObject, belongHouse->DrawObject))
 		{
-			if (ObjectIsRice(TakeOnThing))
+			
+			while (TakeOnThingSum > 0)
 			{
-				PutRice();
+				if (ObjectIsRice(TakeOnThing[TakeOnThingSum-1]))
+				{
+					PutRice();
+				}
 			}
+			
+			Eat();
+			Sleep();
+
 		}
 	}
 }
 
 void Farmer::PutRice()
 {
-	belongHouse->StoneRice[belongHouse->StoneRiceSum] = TakeOnThing;
+	belongHouse->StoneRice[belongHouse->StoneRiceSum] = TakeOnThing[TakeOnThingSum-1];
+	
 	belongHouse->StoneRiceSum++;
 	
 	if (DebugShowGrowTimeFlag)
 	{
 		std::cout << "Rice In House No." << belongHouse->id << " Sum " << belongHouse->StoneRiceSum << std::endl;
 	}
-	RemoveDrawObecjt(TakeOnThing);
-	TakeOnThing = NULL;
+	RemoveDrawObecjt(TakeOnThing[TakeOnThingSum-1]);
+	TakeOnThing[TakeOnThingSum-1] = NULL;
+	TakeOnThingSum--;
+	
+}
+
+void Farmer::GetARiceToHand()
+{
+	TakeOnThing[TakeOnThingSum] = belongHouse->StoneRice[belongHouse->StoneRiceSum - 1];
+	TakeOnThingSum++;
+}
+
+void Farmer::GetAllRiceToHand()
+{
+	for (int i = 0; i < belongHouse->StoneRiceSum; i++)
+	{
+		TakeOnThing[TakeOnThingSum] = belongHouse->StoneRice[i];
+		TakeOnThingSum++;
+	}
+	//belongHouse->StoneRiceSum = 0;
 }
 
 //卖米给村长，换钱
 bool Farmer::SellRiceForMoney()
 {
-	if (king.monney >= RicePrice)
+	if (king.monney >= RicePrice&&TakeOnThingSum>0)
 	{
 		this->monney += RicePrice;
-		RemoveDrawObecjt(TakeOnThing);
-		TakeOnThing = NULL;
+		RemoveDrawObecjt(TakeOnThing[TakeOnThingSum-1]);
+		TakeOnThing[TakeOnThingSum-1] = NULL;
+		TakeOnThingSum--;
 
 		king.monney -= RicePrice;
 		king.belongHouse->StoneRice[king.belongHouse->StoneRiceSum] = this->belongHouse->StoneRice[this->belongHouse->StoneRiceSum-1];
