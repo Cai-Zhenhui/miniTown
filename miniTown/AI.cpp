@@ -2,6 +2,7 @@
 using namespace std;
 int RicePrice=3;
 int HousePrice=10;
+int FirstPayHousePrice = 10;
 
 void AILoop()
 {
@@ -168,6 +169,11 @@ void Builder::BuildHouse()
 	{
 		if (clkClick)
 		{
+			if (AimUnFinishHouse->FirstBuildMonney > 0)
+			{
+				this->money += AimUnFinishHouse->FirstBuildMonney;
+				AimUnFinishHouse->FirstBuildMonney = 0;
+			}
 			AimUnFinishHouse->buildTime += timeScale;
 		}
 		//std::cout << AimUnFinishHouse->buildTime << std::endl;
@@ -290,6 +296,7 @@ void Object::WalkTo(Object* object)
 		y -= timeScale;
 	}
 }
+
 
 
 void Farmer::AI()
@@ -426,4 +433,29 @@ void King::SetRicePrice(int Price)
 void King::SetHousePrice(int Price)
 {
 	HousePrice = Price;
+}
+
+
+//在村长当前位置设置一个盖房子的标记，木匠随后会去盖房子
+bool King::SetUnFinishHouseMark()
+{
+	if (monney >= FirstPayHousePrice)
+	{
+		//获得当前位置的坐标
+		coord CoordHere = GetCoord(this->DrawObject);
+		//如果现在这个坐标被用了，则退出
+		if (IsCoordUsed(CoordHere))
+		{
+			return false;
+		}
+
+		AddUnFinishHouse(CoordHere.x, CoordHere.y);
+		monney -= FirstPayHousePrice;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
 }

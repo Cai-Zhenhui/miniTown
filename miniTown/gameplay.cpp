@@ -124,6 +124,7 @@ void AddUnFinishHouse(int x, int y)
 	house[NowHouseSum].id = NowHouseSum - 1;
 	house[NowHouseSum].DrawObject->x = x *  picHouse.Width;
 	house[NowHouseSum].DrawObject->y = y * picHouse.Height;
+	house[NowHouseSum].FirstBuildMonney = FirstPayHousePrice;
 	AddDrawObject(house[NowHouseSum].DrawObject);
 	NowHouseSum++;
 	
@@ -239,6 +240,8 @@ void ResourceCount()//对村民拥有的资源进行统计
 	int moneyCount = 0;
 	int riceCount = 0;
 	int woodCount = 0;
+	int FinishHouseCount = 0;
+	int UnFinishHouseCount = 0;
 
 	for (int i = 0; i < NowHouseSum; i++)
 	{
@@ -259,11 +262,25 @@ void ResourceCount()//对村民拥有的资源进行统计
 	}
 	moneyCount += king.monney;
 
+	for (int i = 0; i < NowHouseSum; i++)
+	{
+		if (house[i].buildTime == house[i].RequireBuildTime)
+		{
+			FinishHouseCount++;
+		}
+		else
+		{
+			UnFinishHouseCount++;
+		}
+	}
+
 	cout << "==================" << endl;
 	cout << "ResourceCount" << endl;
 	cout << "money:" << moneyCount << endl;
 	cout << "rice:" << riceCount << endl;
 	cout << "wood:" << woodCount << endl;
+	cout << "house:" << FinishHouseCount << endl;
+	cout << "Unfinish house:" << UnFinishHouseCount << endl;
 	
 	cout << endl;
 
@@ -304,4 +321,38 @@ void ShowSky()
 House* FindKingHouse()
 {
 	return king.belongHouse;
+}
+
+coord GetCoord(Object* object)
+{
+	int x = (object->x+object->pic->Width/2) / 60;
+	int y = (object->y+object->pic->Height/2) / 60;
+	return coord(x,y);
+}
+
+bool IsCoordUsed(coord Coord)
+{
+
+	for (int i = 0; i < NowHouseSum; i++)
+	{
+		if (house[i].DrawObject->x == Coord.x * house[i].DrawObject->pic->Width && house[i].DrawObject->y == Coord.y * house[i].DrawObject->pic->Height)
+		{
+			return true;
+		}
+	}
+	for (int i = 0; i < NowFieldSum; i++)
+	{
+		if (field[i].DrawObject->x == Coord.x * field[i].DrawObject->pic->Width && field[i].DrawObject->y == Coord.y * field[i].DrawObject->pic->Height)
+		{
+			return true;
+		}
+	}
+	for (int i = 0; i < NowTreeSum; i++)
+	{
+		if (tree[i].DrawObject->x == Coord.x * tree[i].DrawObject->pic->Width && tree[i].DrawObject->y == Coord.y * tree[i].DrawObject->pic->Height)
+		{
+			return true;
+		}
+	}
+	return false;
 }

@@ -159,7 +159,7 @@ int main()
 		
 		frame++;
 		stop = time(NULL);
-		if (stop - start >= 1)
+		if (stop - start == 1)
 		{
 			runtime+=timeScale;
 			clkClick = true;
@@ -171,7 +171,10 @@ int main()
 			LastFPS = frame;
 			frame = 0;
 			//cout << "run time:" << runtime << endl;
-
+		}
+		else if (stop - start > 1)
+		{
+			start = stop;
 		}
 		else
 		{
@@ -193,6 +196,7 @@ void KeyControl()
 	static int pressH = false;
 	static int pressM = false;
 	static int pressN = false;
+	static int pressB = false;
 	if (screen_keys[VK_ESCAPE])
 	{
 		exit(1);		//Õý³£½áÊø
@@ -284,6 +288,18 @@ void KeyControl()
 	else
 	{
 		pressN = false;
+	}
+	if (screen_keys['B'])
+	{
+		if (pressB == false)
+		{
+			king.SetUnFinishHouseMark();
+		}
+		pressB = true;
+	}
+	else
+	{
+		pressB = false;
 	}
 
 }

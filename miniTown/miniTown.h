@@ -30,7 +30,13 @@ const int SCREEN_HEIGHT = 600;
 const int bits = 24;
 extern BYTE buffer[SCREEN_WIDTH * SCREEN_HEIGHT * bits / 8];
 
-
+class coord //以60*60为单位标记坐标
+{
+public:
+	coord(int X, int Y) :x(X), y(Y) {};
+	coord() :x(0), y(0) {};
+	int x, y;
+};
 
 class Color
 {
@@ -108,6 +114,7 @@ const int MaxWoodSum = 10 * 10;
 
 extern int RicePrice;
 extern int HousePrice;
+extern int FirstPayHousePrice; //盖房子预先给木匠的定金
 
 class Field
 {
@@ -134,6 +141,7 @@ public:
 	int id;
 	float buildTime=0;
 	const int RequireBuildTime = 30;
+	int FirstBuildMonney = 0; //盖房子预付给木匠的钱
 	bool isKingHouse = false;
 	bool isUsed = false;
 	Object *DrawObject;
@@ -220,6 +228,7 @@ public:
 	void DestoryMoney(int Sum);
 	void SetRicePrice(int Price);
 	void SetHousePrice(int Price);
+	bool SetUnFinishHouseMark();  //在村长当前位置设置一个盖房子的记号（木匠随后会取盖房子）需要村长花一部分钱
 
 };
 
@@ -303,3 +312,5 @@ float DistanceAToB(Object* A, Object* B);
 House* GetANearEmptyHouse(Object* man,int type=0); 
 Field* GetANearUnUsedField(Object* man);
 House* FindKingHouse();
+coord GetCoord(Object* object); //获取最接近的坐标
+bool IsCoordUsed(coord Coord);
