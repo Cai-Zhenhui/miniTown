@@ -141,8 +141,7 @@ public:
 	Object* StoneWood[MaxWoodSum];
 	int StoneRiceSum;
 	int StoneWoodSum;
-	void RiceToMoney();
-	void HouseToMoney();
+
 	
 };
 
@@ -171,7 +170,8 @@ public:
 	void GrowRice();
 	void AI();
 	void PutRice();
-	
+	bool SellRiceForMoney();
+
 	
 };
 
@@ -184,6 +184,7 @@ public:
 	House* belongHouse;
 	Tree* AimTree=NULL;
 	House* AimUnFinishHouse = NULL;
+	int OwnHouseCount = 0;   //拥有的还没卖出去的房子数量
 	int wantFoodLevel;
 	int wantSexLevel;
 	int buildTime = 0;
@@ -196,6 +197,8 @@ public:
 	House* FindAUnFinishHouse();
 	void AI();
 	void PutWood();
+
+	bool HouseForMoney();
 };
 
 class King
@@ -209,6 +212,7 @@ public:
 	int wantFoodLevel;
 	int wantSexLevel;
 	Object* TakeOnThing;
+	int HaveEmptyHouseSum=0;
 	void WalkTo(Object* object);
 	
 	void AI();
@@ -216,6 +220,7 @@ public:
 	void DestoryMoney(int Sum);
 	void SetRicePrice(int Price);
 	void SetHousePrice(int Price);
+
 };
 
 
@@ -276,6 +281,8 @@ void AILoop();
 
 //--------------------------------
 //游戏机制
+
+extern bool clkClick;
 void AddUnFinishHouse(int x, int y);
 void AddFinishHouse(int x, int y,int type=0);
 void AddFarmer(int x,int y);
@@ -285,6 +292,7 @@ void AddField(int x, int y);
 void AddKing(int x, int y);
 bool ObjectIsRice(Object* object);
 bool ObjectIsWood(Object* object);
+
 
 void ShowSky();
 

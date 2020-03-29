@@ -1,4 +1,5 @@
 #include"miniTown.h"
+using namespace std;
 int RicePrice=3;
 int HousePrice=10;
 
@@ -27,7 +28,10 @@ void Farmer::GrowRice()
 				{
 					if (LastFPS != 0)
 					{
-						belongField->growingTime += (float)1 / (float)LastFPS * timeScale;
+						if (clkClick)
+						{
+							belongField->growingTime += timeScale;
+						}
 						if (DebugShowGrowTimeFlag)
 						{
 							std::cout << "Farmer No." << this->id << " grow time " << this->belongField->growingTime << std::endl;
@@ -64,7 +68,9 @@ void Farmer::WalkTo(Object* object)
 	DrawObject->WalkTo(object);
 	if (TakeOnThing != NULL)
 	{
-		TakeOnThing->WalkTo(object);
+		TakeOnThing->x = this->DrawObject->x;
+		TakeOnThing->y = this->DrawObject->y;
+		//TakeOnThing->WalkTo(object);
 	}
 }
 
@@ -127,7 +133,11 @@ void Builder::CutTree()
 				{
 					if (LastFPS != 0)
 					{
-						AimTree->cutTime += (float)1 / (float)LastFPS * timeScale;
+						if (clkClick == true)
+						{
+							AimTree->cutTime += timeScale;
+						}
+						
 					}
 					if (DebugShowGrowTimeFlag)
 					{
@@ -156,7 +166,10 @@ void Builder::BuildHouse()
 	
 	if (IsCloseTo(this->DrawObject, AimUnFinishHouse->DrawObject) == true)
 	{
-		AimUnFinishHouse->buildTime += (float)1 / (float)LastFPS * timeScale;
+		if (clkClick)
+		{
+			AimUnFinishHouse->buildTime += timeScale;
+		}
 		//std::cout << AimUnFinishHouse->buildTime << std::endl;
 	}
 	
@@ -165,6 +178,7 @@ void Builder::BuildHouse()
 		AimUnFinishHouse->buildTime = AimUnFinishHouse->RequireBuildTime;
 		AimUnFinishHouse->DrawObject->pic = &picHouse;
 		AimUnFinishHouse = NULL;
+		OwnHouseCount++;
 		belongHouse->StoneWoodSum -= 3;
 	}
 }
@@ -176,6 +190,7 @@ void Builder::AI()
 	{
 		if (wantFoodLevel > 0)
 		{
+			
 			if (AimTree == NULL)
 			{
 				AimTree = FindATree();
@@ -184,7 +199,18 @@ void Builder::AI()
 			{
 				AimUnFinishHouse = FindAUnFinishHouse();
 			}
-			if (belongHouse->StoneWoodSum >= 3&&AimUnFinishHouse!=NULL)
+
+			//有可以卖的房子就拿去卖
+			if (this->OwnHouseCount > 0)
+			{
+				WalkTo(king.DrawObject);
+				if (IsCloseTo(this->DrawObject, king.DrawObject))
+				{
+					this->HouseForMoney();
+				}
+			}
+
+			else if (belongHouse->StoneWoodSum >= 3&&AimUnFinishHouse!=NULL)
 			{
 
 				WalkTo(AimUnFinishHouse->DrawObject);
@@ -226,6 +252,23 @@ void Builder::PutWood()
 	TakeOnThing = NULL;
 }
 
+bool Builder::HouseForMoney()
+{
+	if (king.monney >= HousePrice&&this->OwnHouseCount>0)
+	{
+		this->money += HousePrice;
+		this->OwnHouseCount--;
+		king.HaveEmptyHouseSum++;
+		king.monney -= HousePrice;
+		cout << "Sell house for " << HousePrice << endl;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void Object::WalkTo(Object* object)
 {
 
@@ -249,7 +292,6 @@ void Object::WalkTo(Object* object)
 }
 
 
-
 void Farmer::AI()
 {
 	House* kingHouse = FindKingHouse();
@@ -263,18 +305,20 @@ void Farmer::AI()
 			{
 				
 				TakeOnThing = belongHouse->StoneRice[belongHouse->StoneRiceSum - 1];
+				AddDrawObject(TakeOnThing);
 				WalkTo(kingHouse->DrawObject);
 				if (IsCloseTo(DrawObject, kingHouse->DrawObject))
 				{
-					
+					SellRiceForMoney();
 				}
-
-
 			}
-			
-			WalkTo(belongField->DrawObject);
-			
-			GrowRice();
+			else
+			{
+				WalkTo(belongField->DrawObject);
+
+				GrowRice();
+			}
+
 		}
 	}
 	else
@@ -304,6 +348,29 @@ void Farmer::PutRice()
 	TakeOnThing = NULL;
 }
 
+//卖米给村长，换钱
+bool Farmer::SellRiceForMoney()
+{
+	if (king.monney >= RicePrice)
+	{
+		this->monney += RicePrice;
+		RemoveDrawObecjt(TakeOnThing);
+		TakeOnThing = NULL;
+
+		king.monney -= RicePrice;
+		king.belongHouse->StoneRice[king.belongHouse->StoneRiceSum] = this->belongHouse->StoneRice[this->belongHouse->StoneRiceSum-1];
+		king.belongHouse->StoneRiceSum++;
+		this->belongHouse->StoneRiceSum--;
+		cout << "Sell rice for " << RicePrice << endl;
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void Field::AI()
 {
 
@@ -317,7 +384,7 @@ void Field::AddRice()
 	newObjRice->z = 0;
 	newObjRice->pic = &picRice;
 	NowRiceSum++;
-	std::cout << "Add Rice Called!" << std::endl;
+	//std::cout << "Add Rice Called!" << std::endl;
 	AddDrawObject(newObjRice);
 }
 

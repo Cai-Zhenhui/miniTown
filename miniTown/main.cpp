@@ -1,6 +1,7 @@
 #include"miniTown.h"
 using namespace std;
 
+bool clkClick = false;
 
 Picture picLand;
 Picture picHouse;
@@ -100,6 +101,7 @@ void initObject()
 
 	AddFinishHouse(8, 2,1);
 	AddKing(8, 2);
+	king.monney = 100;
 
 
 	objBackground.pic = &picBackground;
@@ -160,7 +162,7 @@ int main()
 		if (stop - start >= 1)
 		{
 			runtime+=timeScale;
-
+			clkClick = true;
 			
 			start = stop;
 			char title[200];
@@ -170,6 +172,10 @@ int main()
 			frame = 0;
 			//cout << "run time:" << runtime << endl;
 
+		}
+		else
+		{
+			clkClick = false;
 		}
 
 	}
