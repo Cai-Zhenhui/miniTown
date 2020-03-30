@@ -3,7 +3,7 @@ using namespace std;
 int RicePrice=3;
 int HousePrice=10;
 int FirstPayHousePrice = 10;
-int FieldProduceRiceSum = 10;
+int FieldProduceRiceSum = 5;
 
 void AILoop()
 {
@@ -111,9 +111,13 @@ void Farmer::Sleep()
 void Builder::WalkTo(Object* object)
 {
 	DrawObject->WalkTo(object);
-	if (TakeOnThing != NULL)
+	for (int i = 0; i < TakeOnThingSum; i++)
 	{
-		TakeOnThing->WalkTo(object);
+		if (TakeOnThing[i] != NULL)
+		{
+			TakeOnThing[i]->x = this->DrawObject->x;
+			TakeOnThing[i]->y = this->DrawObject->y;
+		}
 	}
 }
 
@@ -188,7 +192,8 @@ void Builder::CutTree()
 	{
 		AimTree->AddWood();
 		AimTree->cutTime = 0;
-		this->TakeOnThing = &objWood[NowWoodSum - 1];
+		this->TakeOnThing[this->TakeOnThingSum] = &objWood[NowWoodSum - 1];
+		this->TakeOnThingSum++;
 		std::cout << "Builder No." << this->id << " take wood!" << std:: endl;
 		
 	}
@@ -198,7 +203,7 @@ void Builder::CutTree()
 void Builder::BuildHouse()
 {
 	
-	if (IsCloseTo(this->DrawObject, AimUnFinishHouse->DrawObject) == true)
+	if (IsMoreCloseTo(this->DrawObject, AimUnFinishHouse->DrawObject) == true)
 	{
 		if (clkClick)
 		{
@@ -222,12 +227,38 @@ void Builder::BuildHouse()
 	}
 }
 
+void Builder::Eat()
+{
+	if (wantFoodLevel > 0 && belongHouse->StoneRiceSum > 0)
+	{
+		belongHouse->StoneRiceSum--;
+		wantFoodLevel--;
+	}
+}
+
+void Builder::Sleep()
+{
+	if (clkClick)
+	{
+		if (DaySum > LastDaySum)
+		{
+			wantFoodLevel++;
+			cout << "want food level update " << wantFoodLevel << endl;
+			LastDaySum = DaySum;
+			ResourceCount();
+		}
+
+	}
+}
+
 void Builder::AI()
 {
+
 	//白天去砍树或种田
-	if ((int)runtime % DayTime < DayTime/2)
+	//在一天的0.2到0.8部分去干活
+	if (DayTimeNow >0.2 &&DayTimeNow<0.7)
 	{
-		if (wantFoodLevel > 0)
+		if (wantFoodLevel > 0||wantSexLevel>0)
 		{
 			
 			if (AimTree == NULL)
@@ -243,10 +274,51 @@ void Builder::AI()
 			if (this->OwnHouseCount > 0)
 			{
 				WalkTo(king.DrawObject);
-				if (IsCloseTo(this->DrawObject, king.DrawObject))
+				if (IsMoreCloseTo(this->DrawObject, king.DrawObject))
 				{
 					this->HouseForMoney();
 				}
+			}
+			//如果想吃饭并且家里没饭并且今天没去买过则
+			else if (wantFoodLevel > 0&&this->belongHouse->StoneRiceSum==0
+				&&isBuyRiceFinish==false)
+			{
+				
+				if (isTryBuyRice == false)
+				{
+					//买不起一个水稻就回去
+					if (this->money < RicePrice)
+					{
+						isTryBuyRice = true;
+					}
+					//去村长家买水稻
+					WalkTo(king.belongHouse->DrawObject);
+					if (IsMoreCloseTo(this->DrawObject, king.belongHouse->DrawObject))
+					{
+						BuyRice();
+						isTryBuyRice = true;
+					}
+				}
+				else
+				{
+					//买完走回家
+					WalkTo(this->belongHouse->DrawObject);
+					if (IsMoreCloseTo(this->DrawObject, this->belongHouse->DrawObject))
+					{
+						while(TakeOnThingSum>0&& ObjectIsRice(this->TakeOnThing[this->TakeOnThingSum - 1])==true)
+						//判断一下手上的东西是不是水稻
+						{	
+							//是的话把手里所有水稻放进家里
+							PutRice();
+							
+							
+						}
+						isBuyRiceFinish = true;
+					}
+
+				}
+
+				
 			}
 
 			else if (belongHouse->StoneWoodSum >= 3&&AimUnFinishHouse!=NULL)
@@ -272,13 +344,23 @@ void Builder::AI()
 		//晚上去睡觉
 		WalkTo(belongHouse->DrawObject);
 		//到家了
-		if (IsCloseTo(DrawObject, belongHouse->DrawObject))
+		if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
 		{
-			
-			if (ObjectIsWood(TakeOnThing))
+			//饿了就吃饭
+			Eat();
+			//然后睡觉
+			Sleep();
+			if (ObjectIsWood(TakeOnThing[TakeOnThingSum-1]))
 			{
 				PutWood();
 			}
+			if (ObjectIsRice(TakeOnThing[TakeOnThingSum - 1]))
+			{
+				PutRice();
+			}
+			//睡觉时重置这两个状态
+			isTryBuyRice = false;
+			isBuyRiceFinish = false;
 		}
 	}
 
@@ -286,11 +368,63 @@ void Builder::AI()
 
 void Builder::PutWood()
 {
-	belongHouse->StoneWood[belongHouse->StoneWoodSum] = TakeOnThing;
+	belongHouse->StoneWood[belongHouse->StoneWoodSum] = TakeOnThing[TakeOnThingSum-1];
 	belongHouse->StoneWoodSum++;
 	std::cout << "Wood In House No." <<belongHouse->id<<" Sum " << belongHouse->StoneWoodSum << std::endl;
-	RemoveDrawObecjt(TakeOnThing);
-	TakeOnThing = NULL;
+	RemoveDrawObecjt(TakeOnThing[TakeOnThingSum-1]);
+	TakeOnThing[TakeOnThingSum-1] = NULL;
+	TakeOnThingSum--;
+}
+
+bool Builder::BuyRice()
+{
+	int wantBuyRiceSum = wantFoodLevel + 3; //现在要买水稻的数量
+	
+	//买不起或者买不到那么多就减一尝试
+	while (this->money < wantBuyRiceSum * RicePrice||king.belongHouse->StoneRiceSum<=wantBuyRiceSum)
+	{
+		wantBuyRiceSum--;
+	}
+	//买不起就回去
+	if (wantBuyRiceSum == 0)
+	{
+		return false;
+	}
+	else //买得起
+	{
+		for (int i = 0; i < wantBuyRiceSum; i++)
+		{
+			//拿起一个水稻到手上
+			this->TakeOnThing[i] = king.belongHouse->StoneRice[king.belongHouse->StoneRiceSum - 1];
+			king.belongHouse->StoneRiceSum--;
+			king.monney += RicePrice;
+			this->TakeOnThingSum++;
+			this->money -= RicePrice;
+			AddDrawObject(this->TakeOnThing[TakeOnThingSum - 1]);//画上手里拿的水稻
+		}
+	}
+
+
+}
+
+bool Builder::PutRice()
+{
+	if (TakeOnThingSum == 0)
+	{
+		return false;
+	}
+	belongHouse->StoneRice[belongHouse->StoneRiceSum] = TakeOnThing[TakeOnThingSum - 1];
+
+	belongHouse->StoneRiceSum++;
+
+	if (DebugShowGrowTimeFlag)
+	{
+		std::cout << "Rice In House No." << belongHouse->id << " Sum " << belongHouse->StoneRiceSum << std::endl;
+	}
+	RemoveDrawObecjt(TakeOnThing[TakeOnThingSum - 1]);
+	TakeOnThing[TakeOnThingSum - 1] = NULL;
+	TakeOnThingSum--;
+	return true;
 }
 
 bool Builder::HouseForMoney()
@@ -338,19 +472,20 @@ void Farmer::AI()
 {
 	House* kingHouse = FindKingHouse();
 	//白天去种田
-	if ((int)runtime % DayTime < DayTime/2)
+	//在一天的0.2到0.8部分去干活
+	if (DayTimeNow > 0.2 && DayTimeNow < 0.7)
 	{
-		if (wantFoodLevel > 0)
+		if (wantFoodLevel > 0||wantSexLevel>0)
 		{
 			//如果有一个水稻就拿去卖
 			if (belongHouse->StoneRiceSum > 0)
 			{
-				cout << "take On thing sum " << TakeOnThingSum << endl;
+				//cout << "take On thing sum " << TakeOnThingSum << endl;
 				//从房子里拿一个水稻来卖
 				
 				if (TakeOnThingSum == 0)
 				{
-					if (IsCloseTo(DrawObject, belongHouse->DrawObject))
+					if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
 					{
 						GetARiceToHand();
 					}
@@ -358,13 +493,12 @@ void Farmer::AI()
 					
 				}
 
-				
 				//如果拿到水稻就拿去卖
 				if (TakeOnThingSum > 0)
 				{
 					AddDrawObject(TakeOnThing[TakeOnThingSum - 1]);
 					WalkTo(kingHouse->DrawObject);
-					if (IsCloseTo(DrawObject, kingHouse->DrawObject))
+					if (IsMoreCloseTo(DrawObject, kingHouse->DrawObject))
 					{
 						SellRiceForMoney();
 					}
@@ -373,6 +507,7 @@ void Farmer::AI()
 			}
 			else
 			{
+			
 				WalkTo(belongField->DrawObject);
 
 				GrowRice();
@@ -385,7 +520,7 @@ void Farmer::AI()
 		//晚上去睡觉
 		WalkTo(belongHouse->DrawObject);
 		//到家了
-		if (IsCloseTo(DrawObject, belongHouse->DrawObject))
+		if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
 		{
 			
 			while (TakeOnThingSum > 0)

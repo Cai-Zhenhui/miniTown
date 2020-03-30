@@ -92,7 +92,7 @@ void initObject()
 		
 	}
 
-	for (int i = 1; i < 2; i++)
+	for (int i = 1; i < 4; i++)
 	{
 		AddTree(3, i);
 		AddFinishHouse(4, i);
@@ -150,6 +150,7 @@ int main()
 	
 	while (1)
 	{
+
 		KeyControl();
 		MsgGet();
 		Draw();
@@ -166,8 +167,12 @@ int main()
 			runtime+=timeScale;
 			clkClick = true;
 			DayTimeNow = (float)((int)runtime % DayTime) / DayTime;
+			if ((int)runtime == 32)
+			{
+				cout << 233 << endl;
+			}
 			DaySum = (int)runtime / DayTime;
-			cout << DaySum << endl;
+			//cout << DaySum << endl;
 			
 			start = stop;
 			char title[200];

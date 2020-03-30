@@ -68,7 +68,8 @@ public:
 
 void CleanScreen();
 void Draw();
-extern Object* drawList[1000];
+const int MaxDrawObjectSum = 100000;
+extern Object* drawList[MaxDrawObjectSum];
 extern int drawSum;
 
 void AddDrawObject(Object* object);
@@ -210,16 +211,25 @@ public:
 	int wantSexLevel;
 	int buildTime = 0;
 	Object* DrawObject;
-	Object* TakeOnThing;
+	Object* TakeOnThing[MaxObjectSum];
+	int TakeOnThingSum = 0;
 	void WalkTo(Object* object);
 	void BuildHouse();
+	void Eat();
+	void Sleep();
 	void CutTree();
 	Tree* FindATree();
 	House* FindAUnFinishHouse();
 	void AI();
 	void PutWood();
+	bool BuyRice();
+	bool PutRice();
 
 	bool HouseForMoney();
+	int LastDaySum = 0; //用来计算食欲的临时变量
+	//买水稻用的临时变量
+	bool isTryBuyRice = false;
+	bool isBuyRiceFinish = false;
 };
 
 class King
@@ -318,9 +328,11 @@ bool ObjectIsWood(Object* object);
 
 void ShowSky();
 
+
 void ResourceCount();//对村民拥有的资源进行统计
 
 bool IsCloseTo(Object* A, Object* B);  //判断两个Object是否靠近
+bool IsMoreCloseTo(Object* A, Object* B); //判断两个Object是否更靠近
 float DistanceAToB(Object* A, Object* B);
 House* GetANearEmptyHouse(Object* man,int type=0); 
 Field* GetANearUnUsedField(Object* man);

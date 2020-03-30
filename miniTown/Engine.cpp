@@ -1,6 +1,6 @@
 #include"miniTown.h"
 
-Object* drawList[1000];
+Object* drawList[MaxDrawObjectSum];
 int drawSum=0;
 
 BYTE buffer[SCREEN_WIDTH * SCREEN_HEIGHT * bits / 8];

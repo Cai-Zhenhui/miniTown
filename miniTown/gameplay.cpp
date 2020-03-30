@@ -1,6 +1,26 @@
 #include"miniTown.h"
 using namespace std;
 
+
+
+bool IsMoreCloseTo(Object* A, Object* B)
+{
+	if (A->x + A->pic->Width/2 > B->x)
+	{
+		if (A->x< B->x + B->pic->Width/2)
+		{
+			if (A->y + A->pic->Height/2 > B->y)
+			{
+				if (A->y < B->y + B->pic->Height/2)
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 //判断两个object是否接触
 bool IsCloseTo(Object* A, Object* B)
 {
@@ -160,7 +180,7 @@ void AddFarmer(int x,int y)
 	farmer[NowFarmerSum].belongHouse = GetANearEmptyHouse(farmer[NowFarmerSum].DrawObject);
 	farmer[NowFarmerSum].age = 18;
 	farmer[NowFarmerSum].monney = 10;
-	farmer[NowFarmerSum].wantFoodLevel = 1;
+	farmer[NowFarmerSum].wantFoodLevel = 0;
 	farmer[NowFarmerSum].wantSexLevel = 1;
 	farmer[NowFarmerSum].id = NowFarmerSum;
 	
@@ -179,7 +199,7 @@ void AddBuilder(int x, int y)
 	builder[NowBuilderSum].belongHouse = GetANearEmptyHouse(builder[NowBuilderSum].DrawObject);
 	builder[NowBuilderSum].age = 18;
 	builder[NowBuilderSum].money = 10;
-	builder[NowBuilderSum].wantFoodLevel = 1;
+	builder[NowBuilderSum].wantFoodLevel = 0;
 	builder[NowBuilderSum].wantSexLevel = 1;
 	builder[NowBuilderSum].id = NowBuilderSum;
 
@@ -284,22 +304,24 @@ void ResourceCount()//对村民拥有的资源进行统计
 	
 	cout << endl;
 
+
 	cout << "Farmer:" << endl;
-	cout << "id\tmonney\tage\trice\twantFood\twantSex" << endl;
+	cout << "id\tmonney\tage\trice\twFood\twSex" << endl;
 	for (int i = 0; i < NowFarmerSum; i++)
 	{
 		cout << farmer[i].id << "\t" << farmer[i].monney << "\t" << farmer[i].age<<"\t"<<farmer[i].belongHouse->StoneRiceSum<<"\t"<<farmer[i].wantFoodLevel<<"\t"<<farmer[i].wantSexLevel << endl;
 	}
 	cout << "Builder:" << endl;
-	cout << "id\tmonney\tage\tHouse\tWood\twantFood\twantSex" << endl;
+	cout << "id\tmonney\tage\trice\tHouse\tWood\twFood\twSex" << endl;
 	for (int i = 0; i < NowBuilderSum; i++)
 	{
-		cout << builder[i].id << "\t" << builder[i].money << "\t" << builder[i].age<<"\t"<<builder[i].OwnHouseCount<<"\t"<<builder[i].belongHouse->StoneWoodSum<<"\t"<<builder[i].wantFoodLevel<<"\t"<<builder[i].wantSexLevel << endl;
+		cout << builder[i].id << "\t" << builder[i].money << "\t" << builder[i].age<<"\t"<<builder[i].belongHouse->StoneRiceSum<<"\t"<<builder[i].OwnHouseCount<<"\t"<<builder[i].belongHouse->StoneWoodSum<<"\t"<<builder[i].wantFoodLevel<<"\t"<<builder[i].wantSexLevel << endl;
 	}
 	cout << "King:" << endl;
 	cout << "monney\tage\tHouse\tRice" << endl;
 	cout << king.monney << "\t" << king.age << "\t" << king.HaveEmptyHouseSum<<"\t"<<king.belongHouse->StoneRiceSum << endl;
 	cout << "==================" << endl;
+
 }
 
 
