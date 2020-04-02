@@ -44,7 +44,7 @@ void RemoveDrawObecjt(Object* object)
 	}
 }
 
-void DrawPoint(int &x, int &y, const Color &color)
+inline void DrawPoint(int &x, int &y, const Color &color)
 {
 	if (x <= 0 || x >= SCREEN_WIDTH)return;
 	if (y <= 0 || y >= SCREEN_HEIGHT)return;
@@ -54,7 +54,7 @@ void DrawPoint(int &x, int &y, const Color &color)
 	buffer[int(y) * SCREEN_WIDTH * 3 + (int(x) + 1) * 3 - 3] = color.b;
 }
 
-void DrawPoint(int& x, int& y, int &r,int &g,int &b)
+inline void DrawPoint(int& x, int& y, int &r,int &g,int &b)
 {
 	if (x <= 0 || x >= SCREEN_WIDTH)return;
 	if (y <= 0 || y >= SCREEN_HEIGHT)return;

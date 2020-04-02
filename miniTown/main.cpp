@@ -88,22 +88,22 @@ void initObject()
 	{
 		AddField(1, i);
 		AddFinishHouse(2, i);
-		AddFarmer(2, i);
+		AddFarmer(2, i,1);
 		
 	}
 
-	for (int i = 1; i < 4; i++)
+	for (int i = 1; i < 3; i++)
 	{
 		AddTree(3, i);
 		AddFinishHouse(4, i);
-		AddBuilder(4, i);
+		AddBuilder(4, i,0);
 		AddUnFinishHouse(5, i);
 	}
 
 
 	AddFinishHouse(8, 2,1);
 	AddKing(8, 2);
-	king.monney = 100;
+	king.money = 100;
 
 
 	objBackground.pic = &picBackground;
@@ -119,7 +119,6 @@ void initObject()
 	objMoon.pic = &picMoon;
 	objMoon.x = -objMoon.pic->Width;
 	AddDrawObject(&objMoon);
-
 
 
 }
@@ -167,10 +166,7 @@ int main()
 			runtime+=timeScale;
 			clkClick = true;
 			DayTimeNow = (float)((int)runtime % DayTime) / DayTime;
-			if ((int)runtime == 32)
-			{
-				cout << 233 << endl;
-			}
+
 			DaySum = (int)runtime / DayTime;
 			//cout << DaySum << endl;
 			

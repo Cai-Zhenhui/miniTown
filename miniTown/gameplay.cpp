@@ -144,7 +144,7 @@ void AddUnFinishHouse(int x, int y)
 	house[NowHouseSum].id = NowHouseSum - 1;
 	house[NowHouseSum].DrawObject->x = x *  picHouse.Width;
 	house[NowHouseSum].DrawObject->y = y * picHouse.Height;
-	house[NowHouseSum].FirstBuildMonney = FirstPayHousePrice;
+	house[NowHouseSum].FirstBuildMoney = FirstPayHousePrice;
 	AddDrawObject(house[NowHouseSum].DrawObject);
 	NowHouseSum++;
 	
@@ -169,7 +169,7 @@ void AddFinishHouse(int x, int y,int type)
 	NowHouseSum++;
 }
 
-void AddFarmer(int x,int y)
+void AddFarmer(int x,int y,int sex)
 {
 	objFarmer[NowFarmerSum].pic = &picFarmer;
 	objFarmer[NowFarmerSum].x = x * objFarmer[NowFarmerSum].pic->Width;
@@ -179,17 +179,18 @@ void AddFarmer(int x,int y)
 	farmer[NowFarmerSum].belongField = GetANearUnUsedField(farmer[NowFarmerSum].DrawObject);
 	farmer[NowFarmerSum].belongHouse = GetANearEmptyHouse(farmer[NowFarmerSum].DrawObject);
 	farmer[NowFarmerSum].age = 18;
-	farmer[NowFarmerSum].monney = 10;
-	farmer[NowFarmerSum].wantFoodLevel = 0;
-	farmer[NowFarmerSum].wantSexLevel = 1;
+	farmer[NowFarmerSum].money = 10;
+	farmer[NowFarmerSum].wantFoodLevel = 1;
+	farmer[NowFarmerSum].wantSexLevel = 0;
 	farmer[NowFarmerSum].id = NowFarmerSum;
+	farmer[NowFarmerSum].Sex = sex;
 	
 
 	AddDrawObject(farmer[NowFarmerSum].DrawObject);
 	NowFarmerSum++;
 }
 
-void AddBuilder(int x, int y)
+void AddBuilder(int x, int y,int sex)
 {
 	objBuilder[NowBuilderSum].pic = &picBuilder;
 	objBuilder[NowBuilderSum].x = x*objBuilder[NowBuilderSum].pic->Width;
@@ -199,26 +200,28 @@ void AddBuilder(int x, int y)
 	builder[NowBuilderSum].belongHouse = GetANearEmptyHouse(builder[NowBuilderSum].DrawObject);
 	builder[NowBuilderSum].age = 18;
 	builder[NowBuilderSum].money = 10;
-	builder[NowBuilderSum].wantFoodLevel = 0;
-	builder[NowBuilderSum].wantSexLevel = 1;
+	builder[NowBuilderSum].wantFoodLevel = 1;
+	builder[NowBuilderSum].wantSexLevel = 0;
 	builder[NowBuilderSum].id = NowBuilderSum;
+	builder[NowBuilderSum].Sex = sex;
 
 	AddDrawObject(builder[NowBuilderSum].DrawObject);
 	NowBuilderSum++;
 }
 
-void AddKing(int x, int y)
+void AddKing(int x, int y,int sex)
 {
 	objKing.pic = &picKing;
 	objKing.x = x * objKing.pic->Width;
 	objKing.y = y * objKing.pic->Height;
+	king.Sex = sex;
 
 	king.DrawObject = &objKing;
 	king.belongHouse = GetANearEmptyHouse(king.DrawObject,1);
 	king.belongHouse->isUsed = true;
 	king.id = 0;
 	king.age = 18;
-	king.monney = 0;
+	king.money = 0;
 	king.wantFoodLevel = 1;
 	king.wantSexLevel = 1;
 	AddDrawObject(king.DrawObject);
@@ -274,13 +277,13 @@ void ResourceCount()//对村民拥有的资源进行统计
 
 	for (int i = 0; i < NowFarmerSum; i++)
 	{
-		moneyCount += farmer[i].monney;
+		moneyCount += farmer[i].money;
 	}
 	for (int i = 0; i < NowBuilderSum; i++)
 	{
 		moneyCount += builder[i].money;
 	}
-	moneyCount += king.monney;
+	moneyCount += king.money;
 
 	for (int i = 0; i < NowHouseSum; i++)
 	{
@@ -296,6 +299,7 @@ void ResourceCount()//对村民拥有的资源进行统计
 
 	cout << "==================" << endl;
 	cout << "ResourceCount" << endl;
+	cout << "DrawObjectSum:" << drawSum << endl;
 	cout << "money:" << moneyCount << endl;
 	cout << "rice:" << riceCount << endl;
 	cout << "wood:" << woodCount << endl;
@@ -306,22 +310,22 @@ void ResourceCount()//对村民拥有的资源进行统计
 
 
 	cout << "Farmer:" << endl;
-	cout << "id\tmonney\tage\trice\twFood\twSex" << endl;
+	cout << "id\tsex\tmoney\tage\trice\twFood\twSex" << endl;
 	for (int i = 0; i < NowFarmerSum; i++)
 	{
-		cout << farmer[i].id << "\t" << farmer[i].monney << "\t" << farmer[i].age<<"\t"<<farmer[i].belongHouse->StoneRiceSum<<"\t"<<farmer[i].wantFoodLevel<<"\t"<<farmer[i].wantSexLevel << endl;
+		cout << farmer[i].id << "\t" <<((farmer[i].Sex==1)?"man":"woman")<<"\t"<< farmer[i].money << "\t" << farmer[i].age<<"\t"<<farmer[i].belongHouse->StoneRiceSum<<"\t"<<farmer[i].wantFoodLevel<<"\t"<<farmer[i].wantSexLevel << endl;
 	}
 	cout << "Builder:" << endl;
-	cout << "id\tmonney\tage\trice\tHouse\tWood\twFood\twSex" << endl;
+	cout << "id\tsex\tmoney\tage\trice\tHouse\tWood\twFood\twSex" << endl;
 	for (int i = 0; i < NowBuilderSum; i++)
 	{
-		cout << builder[i].id << "\t" << builder[i].money << "\t" << builder[i].age<<"\t"<<builder[i].belongHouse->StoneRiceSum<<"\t"<<builder[i].OwnHouseCount<<"\t"<<builder[i].belongHouse->StoneWoodSum<<"\t"<<builder[i].wantFoodLevel<<"\t"<<builder[i].wantSexLevel << endl;
+		cout << builder[i].id << "\t"<<((builder[i].Sex==1) ? "man" : "woman")<<"\t" << builder[i].money << "\t" << builder[i].age<<"\t"<<builder[i].belongHouse->StoneRiceSum<<"\t"<<builder[i].OwnHouseCount<<"\t"<<builder[i].belongHouse->StoneWoodSum<<"\t"<<builder[i].wantFoodLevel<<"\t"<<builder[i].wantSexLevel << endl;
 	}
 	cout << "King:" << endl;
-	cout << "monney\tage\tHouse\tRice" << endl;
-	cout << king.monney << "\t" << king.age << "\t" << king.HaveEmptyHouseSum<<"\t"<<king.belongHouse->StoneRiceSum << endl;
+	cout << "sex\tmoney\tage\tHouse\tRice" << endl;
+	cout << king.Sex<<"\t"<< king.money << "\t" << king.age << "\t" << king.HaveEmptyHouseSum<<"\t"<<king.belongHouse->StoneRiceSum << endl;
 	cout << "==================" << endl;
-
+	
 }
 
 

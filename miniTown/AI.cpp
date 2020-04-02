@@ -1,7 +1,7 @@
 #include"miniTown.h"
 using namespace std;
 int RicePrice=3;
-int HousePrice=10;
+int HousePrice=30;
 int FirstPayHousePrice = 10;
 int FieldProduceRiceSum = 5;
 
@@ -100,12 +100,12 @@ void Farmer::Sleep()
 		if (DaySum > LastDaySum)
 		{
 			wantFoodLevel++;
-			cout << "want food level update " << wantFoodLevel << endl;
+			wantSexLevel += 0.5;
+			age += 0.25;
+			//cout << "want food level update " << wantFoodLevel << endl;
 			LastDaySum = DaySum;
 		}
-		
 	}
-
 }
 
 void Builder::WalkTo(Object* object)
@@ -145,7 +145,7 @@ House* Builder::FindAUnFinishHouse()
 	House* ClossestHouse = NULL;
 	for (int i = 0; i < NowHouseSum; i++)
 	{
-		if (house[i].buildTime < house[i].RequireBuildTime)
+		if (house[i].buildTime < house[i].RequireBuildTime&&house[i].isOnBuild==false)
 		{
 			int nowDistance = DistanceAToB(this->DrawObject, house[i].DrawObject);
 			if (nowDistance < minDistance)
@@ -155,6 +155,11 @@ House* Builder::FindAUnFinishHouse()
 			}
 		}
 		
+	}
+	if (ClossestHouse != NULL)
+	{
+		ClossestHouse->isOnBuild = true;
+
 	}
 	return ClossestHouse;
 }
@@ -207,10 +212,10 @@ void Builder::BuildHouse()
 	{
 		if (clkClick)
 		{
-			if (AimUnFinishHouse->FirstBuildMonney > 0)
+			if (AimUnFinishHouse->FirstBuildMoney > 0)
 			{
-				this->money += AimUnFinishHouse->FirstBuildMonney;
-				AimUnFinishHouse->FirstBuildMonney = 0;
+				this->money += AimUnFinishHouse->FirstBuildMoney;
+				AimUnFinishHouse->FirstBuildMoney = 0;
 			}
 			AimUnFinishHouse->buildTime += timeScale;
 		}
@@ -243,7 +248,9 @@ void Builder::Sleep()
 		if (DaySum > LastDaySum)
 		{
 			wantFoodLevel++;
-			cout << "want food level update " << wantFoodLevel << endl;
+			wantSexLevel += 0.5;
+			age += 0.25;
+			//cout << "want food level update " << wantFoodLevel << endl;
 			LastDaySum = DaySum;
 			ResourceCount();
 		}
@@ -253,116 +260,134 @@ void Builder::Sleep()
 
 void Builder::AI()
 {
-
-	//白天去砍树或种田
-	//在一天的0.2到0.8部分去干活
-	if (DayTimeNow >0.2 &&DayTimeNow<0.7)
+	if (this->isDead == false)
 	{
-		if (wantFoodLevel > 0||wantSexLevel>0)
+		isTryBuyHouse = false;
+		//白天去砍树或种田
+	//在一天的0.2到0.8部分去干活
+		if (DayTimeNow > 0.2 && DayTimeNow < 0.7)
 		{
-			
-			if (AimTree == NULL)
+			if (wantFoodLevel > 0 || wantSexLevel > 0)
 			{
-				AimTree = FindATree();
-			}
-			if (AimUnFinishHouse == NULL)
-			{
-				AimUnFinishHouse = FindAUnFinishHouse();
-			}
 
-			//有可以卖的房子就拿去卖
-			if (this->OwnHouseCount > 0)
-			{
-				WalkTo(king.DrawObject);
-				if (IsMoreCloseTo(this->DrawObject, king.DrawObject))
+				if (AimTree == NULL)
 				{
-					this->HouseForMoney();
+					AimTree = FindATree();
 				}
-			}
-			//如果想吃饭并且家里没饭并且今天没去买过则
-			else if (wantFoodLevel > 0&&this->belongHouse->StoneRiceSum==0
-				&&isBuyRiceFinish==false)
-			{
-				
-				if (isTryBuyRice == false)
+				if (AimUnFinishHouse == NULL)
 				{
-					//买不起一个水稻就回去
-					if (this->money < RicePrice)
+					AimUnFinishHouse = FindAUnFinishHouse();
+				}
+
+				//有可以卖的房子就拿去卖
+				if (this->OwnHouseCount > 0)
+				{
+					WalkTo(king.DrawObject);
+					if (IsMoreCloseTo(this->DrawObject, king.DrawObject))
 					{
-						isTryBuyRice = true;
+						this->HouseForMoney();
 					}
-					//去村长家买水稻
-					WalkTo(king.belongHouse->DrawObject);
-					if (IsMoreCloseTo(this->DrawObject, king.belongHouse->DrawObject))
+				}
+				else if (this->Sex==1&& this->money >= HousePrice && this->ownHouse == NULL && isTryBuyHouse == false) //有钱就去买房
+				{
+					WalkTo(king.DrawObject);
+					if (IsMoreCloseTo(DrawObject, king.DrawObject))
 					{
-						BuyRice();
-						isTryBuyRice = true;
+						BuyHouse();
+						cout << "Buy house!" << endl;
 					}
+					isTryBuyHouse = true;
+					
+				}
+				//如果想吃饭并且家里没饭并且今天没去买过则
+				else if (wantFoodLevel > 0 && this->belongHouse->StoneRiceSum == 0
+					&& isBuyRiceFinish == false)
+				{
+
+					if (isTryBuyRice == false)
+					{
+						//买不起一个水稻就回去
+						if (this->money < RicePrice)
+						{
+							isTryBuyRice = true;
+						}
+						//去村长家买水稻
+						WalkTo(king.belongHouse->DrawObject);
+						if (IsMoreCloseTo(this->DrawObject, king.belongHouse->DrawObject))
+						{
+							BuyRice();
+							isTryBuyRice = true;
+						}
+					}
+					else
+					{
+						//买完走回家
+						WalkTo(this->belongHouse->DrawObject);
+						if (IsMoreCloseTo(this->DrawObject, this->belongHouse->DrawObject))
+						{
+							while (TakeOnThingSum > 0 && ObjectIsRice(this->TakeOnThing[this->TakeOnThingSum - 1]) == true)
+								//判断一下手上的东西是不是水稻
+							{
+								//是的话把手里所有水稻放进家里
+								PutRice();
+
+
+							}
+							isBuyRiceFinish = true;
+							isTryBuyHouse = true;
+						}
+
+					}
+
+
+				}
+
+				else if (belongHouse->StoneWoodSum >= 3 && AimUnFinishHouse != NULL)
+				{
+
+					WalkTo(AimUnFinishHouse->DrawObject);
+					BuildHouse();
+
 				}
 				else
 				{
-					//买完走回家
-					WalkTo(this->belongHouse->DrawObject);
-					if (IsMoreCloseTo(this->DrawObject, this->belongHouse->DrawObject))
+					if (AimTree != NULL)
 					{
-						while(TakeOnThingSum>0&& ObjectIsRice(this->TakeOnThing[this->TakeOnThingSum - 1])==true)
-						//判断一下手上的东西是不是水稻
-						{	
-							//是的话把手里所有水稻放进家里
-							PutRice();
-							
-							
-						}
-						isBuyRiceFinish = true;
+						WalkTo(AimTree->DrawObject);
+						CutTree();
 					}
 
 				}
-
-				
-			}
-
-			else if (belongHouse->StoneWoodSum >= 3&&AimUnFinishHouse!=NULL)
-			{
-
-				WalkTo(AimUnFinishHouse->DrawObject);
-				BuildHouse();
-
-			}
-			else
-			{
-				if (AimTree != NULL)
-				{
-					WalkTo(AimTree->DrawObject);
-					CutTree();
-				}
-				
 			}
 		}
-	}
-	else
-	{
-		//晚上去睡觉
-		WalkTo(belongHouse->DrawObject);
-		//到家了
-		if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
+		else
 		{
-			//饿了就吃饭
-			Eat();
-			//然后睡觉
-			Sleep();
-			if (ObjectIsWood(TakeOnThing[TakeOnThingSum-1]))
+			//晚上去睡觉
+			WalkTo(belongHouse->DrawObject);
+			//到家了
+			if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
 			{
-				PutWood();
+				//饿了就吃饭
+				Eat();
+				//然后睡觉
+				Sleep();
+				if (ObjectIsWood(TakeOnThing[TakeOnThingSum - 1]))
+				{
+					PutWood();
+				}
+				if (ObjectIsRice(TakeOnThing[TakeOnThingSum - 1]))
+				{
+					PutRice();
+				}
+				judgeDead(); //判断是否饿死
+				//睡觉时重置这两个状态
+				isTryBuyRice = false;
+				isBuyRiceFinish = false;
 			}
-			if (ObjectIsRice(TakeOnThing[TakeOnThingSum - 1]))
-			{
-				PutRice();
-			}
-			//睡觉时重置这两个状态
-			isTryBuyRice = false;
-			isBuyRiceFinish = false;
 		}
 	}
+
+	
 
 }
 
@@ -374,6 +399,19 @@ void Builder::PutWood()
 	RemoveDrawObecjt(TakeOnThing[TakeOnThingSum-1]);
 	TakeOnThing[TakeOnThingSum-1] = NULL;
 	TakeOnThingSum--;
+}
+
+bool Builder::BuyHouse()
+{
+	if (this->money >= HousePrice&&king.HaveEmptyHouseSum>0)
+	{
+		this->money -= HousePrice;
+		king.money += HousePrice;
+		king.HaveEmptyHouseSum--;
+		this->belongHouse = GetANearEmptyHouse(this->DrawObject);
+		return true;
+	}
+	return false;
 }
 
 bool Builder::BuyRice()
@@ -397,7 +435,7 @@ bool Builder::BuyRice()
 			//拿起一个水稻到手上
 			this->TakeOnThing[i] = king.belongHouse->StoneRice[king.belongHouse->StoneRiceSum - 1];
 			king.belongHouse->StoneRiceSum--;
-			king.monney += RicePrice;
+			king.money += RicePrice;
 			this->TakeOnThingSum++;
 			this->money -= RicePrice;
 			AddDrawObject(this->TakeOnThing[TakeOnThingSum - 1]);//画上手里拿的水稻
@@ -427,15 +465,28 @@ bool Builder::PutRice()
 	return true;
 }
 
+void Builder::judgeDead()
+{
+	if (wantFoodLevel > 5)
+	{
+		this->belongHouse->isUsed = false;
+		this->AimTree = NULL;
+		this->AimUnFinishHouse = NULL;
+		RemoveDrawObecjt(this->DrawObject);
+		this->isDead = true;
+	}
+
+}
+
 bool Builder::HouseForMoney()
 {
-	if (king.monney >= HousePrice&&this->OwnHouseCount>0)
+	if (king.money >= HousePrice-FirstPayHousePrice&&this->OwnHouseCount>0)
 	{
-		this->money += HousePrice;
+		this->money += HousePrice- FirstPayHousePrice;
 		this->OwnHouseCount--;
 		king.HaveEmptyHouseSum++;
-		king.monney -= HousePrice;
-		cout << "Sell house for " << HousePrice << endl;
+		king.money -= HousePrice- FirstPayHousePrice;
+		cout << "Sell house for " << HousePrice- FirstPayHousePrice << endl;
 		return true;
 	}
 	else
@@ -470,72 +521,89 @@ void Object::WalkTo(Object* object)
 
 void Farmer::AI()
 {
-	House* kingHouse = FindKingHouse();
-	//白天去种田
-	//在一天的0.2到0.8部分去干活
-	if (DayTimeNow > 0.2 && DayTimeNow < 0.7)
+	if (isDead == false)
 	{
-		if (wantFoodLevel > 0||wantSexLevel>0)
+	
+		House* kingHouse = FindKingHouse();
+		//白天去种田
+		//在一天的0.2到0.8部分去干活
+		if (DayTimeNow > 0.2 && DayTimeNow < 0.7)
 		{
-			//如果有一个水稻就拿去卖
-			if (belongHouse->StoneRiceSum > 0)
+			if (wantFoodLevel > 0 || wantSexLevel > 0)
 			{
-				//cout << "take On thing sum " << TakeOnThingSum << endl;
-				//从房子里拿一个水稻来卖
-				
-				if (TakeOnThingSum == 0)
+				//如果有一个水稻就拿去卖
+				if (belongHouse->StoneRiceSum > 0)
 				{
-					if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
+					//cout << "take On thing sum " << TakeOnThingSum << endl;
+					//从房子里拿一个水稻来卖
+
+					if (TakeOnThingSum == 0)
 					{
-						GetARiceToHand();
+						if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
+						{
+							GetARiceToHand();
+						}
+						WalkTo(belongHouse->DrawObject);
+
 					}
-					WalkTo(belongHouse->DrawObject);
+
+					//如果拿到水稻就拿去卖
+					if (TakeOnThingSum > 0)
+					{
+						AddDrawObject(TakeOnThing[TakeOnThingSum - 1]);
+						WalkTo(kingHouse->DrawObject);
+						if (IsMoreCloseTo(DrawObject, kingHouse->DrawObject))
+						{
+							SellRiceForMoney();
+						}
+					}
+
+				}
+				else if (this->Sex==1&& this->money >= HousePrice&&this->ownHouse==NULL&& isTryBuyHouse==false) //有钱就去买房
+				{
+					WalkTo(king.DrawObject);
+					if (IsMoreCloseTo(DrawObject, king.DrawObject))
+					{
+						BuyHouse();
+						cout << "Buy house!" << endl;
+					}
+					isTryBuyHouse = true;
 					
 				}
-
-				//如果拿到水稻就拿去卖
-				if (TakeOnThingSum > 0)
+				else
 				{
-					AddDrawObject(TakeOnThing[TakeOnThingSum - 1]);
-					WalkTo(kingHouse->DrawObject);
-					if (IsMoreCloseTo(DrawObject, kingHouse->DrawObject))
+
+					WalkTo(belongField->DrawObject);
+
+					GrowRice();
+				}
+
+			}
+		}
+		else
+		{
+			//晚上去睡觉
+			WalkTo(belongHouse->DrawObject);
+			//到家了
+			if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
+			{
+
+				while (TakeOnThingSum > 0)
+				{
+					if (ObjectIsRice(TakeOnThing[TakeOnThingSum - 1]))
 					{
-						SellRiceForMoney();
+						PutRice();
 					}
 				}
 
-			}
-			else
-			{
-			
-				WalkTo(belongField->DrawObject);
+				Eat();
+				Sleep();
+				isTryBuyHouse = false; //尝试买房子状态清零
 
-				GrowRice();
 			}
-
 		}
 	}
-	else
-	{
-		//晚上去睡觉
-		WalkTo(belongHouse->DrawObject);
-		//到家了
-		if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
-		{
-			
-			while (TakeOnThingSum > 0)
-			{
-				if (ObjectIsRice(TakeOnThing[TakeOnThingSum-1]))
-				{
-					PutRice();
-				}
-			}
-			
-			Eat();
-			Sleep();
-
-		}
-	}
+	
 }
 
 void Farmer::PutRice()
@@ -570,17 +638,42 @@ void Farmer::GetAllRiceToHand()
 	//belongHouse->StoneRiceSum = 0;
 }
 
+bool Farmer::BuyHouse()
+{
+	if (this->money >= HousePrice && king.HaveEmptyHouseSum > 0)
+	{
+		this->money -= HousePrice;
+		king.money += HousePrice;
+		king.HaveEmptyHouseSum--;
+		this->belongHouse = GetANearEmptyHouse(this->DrawObject);
+		return true;
+	}
+	return false;
+}
+
+void Farmer::judgeDead()
+{
+	if (this->wantFoodLevel > 5)
+	{
+		this->belongHouse->isUsed = false;
+		this->belongField->isUsed = false; 
+		RemoveDrawObecjt(this->DrawObject);
+		this->isDead = true;
+	}
+
+}
+
 //卖米给村长，换钱
 bool Farmer::SellRiceForMoney()
 {
-	if (king.monney >= RicePrice&&TakeOnThingSum>0)
+	if (king.money >= RicePrice&&TakeOnThingSum>0)
 	{
-		this->monney += RicePrice;
+		this->money += RicePrice;
 		RemoveDrawObecjt(TakeOnThing[TakeOnThingSum-1]);
 		TakeOnThing[TakeOnThingSum-1] = NULL;
 		TakeOnThingSum--;
 
-		king.monney -= RicePrice;
+		king.money -= RicePrice;
 		king.belongHouse->StoneRice[king.belongHouse->StoneRiceSum] = this->belongHouse->StoneRice[this->belongHouse->StoneRiceSum-1];
 		king.belongHouse->StoneRiceSum++;
 		this->belongHouse->StoneRiceSum--;
@@ -629,15 +722,15 @@ void King::AI()
 
 void King::MakeMoney(int Sum)
 {
-	this->monney += Sum;
+	this->money += Sum;
 }
 
 void King::DestoryMoney(int Sum)
 {
-	this->monney -= Sum;
-	if (this->monney < 0)
+	this->money -= Sum;
+	if (this->money < 0)
 	{
-		this->monney = 0;
+		this->money = 0;
 	}
 }
 
@@ -655,7 +748,7 @@ void King::SetHousePrice(int Price)
 //在村长当前位置设置一个盖房子的标记，木匠随后会去盖房子
 bool King::SetUnFinishHouseMark()
 {
-	if (monney >= FirstPayHousePrice)
+	if (money >= FirstPayHousePrice)
 	{
 		//获得当前位置的坐标
 		coord CoordHere = GetCoord(this->DrawObject);
@@ -666,7 +759,7 @@ bool King::SetUnFinishHouseMark()
 		}
 
 		AddUnFinishHouse(CoordHere.x, CoordHere.y);
-		monney -= FirstPayHousePrice;
+		money -= FirstPayHousePrice;
 		return true;
 	}
 	else

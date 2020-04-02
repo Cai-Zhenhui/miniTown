@@ -74,8 +74,8 @@ extern int drawSum;
 
 void AddDrawObject(Object* object);
 void RemoveDrawObecjt(Object* object);
-void DrawPoint(int& x, int& y, const Color& color);
-void DrawPoint(int& x, int& y, int& r, int& g, int& b);
+inline void DrawPoint(int& x, int& y, const Color& color);
+inline void DrawPoint(int& x, int& y, int& r, int& g, int& b);
 
 
 
@@ -105,14 +105,14 @@ extern float timeScale;
 
 
 
-const int MaxHouseSum = 10 * 10;
-const int MaxFieldSum = 10 * 10;
-const int MaxFarmerSum = 10 * 10;
-const int MaxBuilderSum = 10 * 10;
-const int MaxTreeSum = 10 * 10;
-const int MaxRiceSum = 10 * 10;
-const int MaxWoodSum = 10 * 10;
-const int MaxObjectSum = 10 * 10;
+const int MaxHouseSum = 1000;
+const int MaxFieldSum = 1000;
+const int MaxFarmerSum = 1000;
+const int MaxBuilderSum = 1000;
+const int MaxTreeSum = 1000;
+const int MaxRiceSum = 1000;
+const int MaxWoodSum = 1000;
+const int MaxObjectSum = 1000;
 
 
 extern int FieldProduceRiceSum;
@@ -139,7 +139,6 @@ class Rice
 public:
 	int id;
 	Object* DrawObject;
-
 };
 
 class House
@@ -148,16 +147,16 @@ public:
 	int id;
 	float buildTime=0;
 	const int RequireBuildTime = 30;
-	int FirstBuildMonney = 0; //盖房子预付给木匠的钱
+	int FirstBuildMoney = 0; //盖房子预付给木匠的钱
 	bool isKingHouse = false;
 	bool isUsed = false;
+	bool isOnBuild = false;
 	Object *DrawObject;
 	Object* StoneRice[MaxRiceSum];
 	Object* StoneWood[MaxWoodSum];
 	int StoneRiceSum;
 	int StoneWoodSum;
 
-	
 };
 
 class Tree
@@ -169,17 +168,23 @@ public:
 	void AddWood();
 };
 
+
+
 class Farmer
 {
 public:
 	int id;
+	int Sex; //男的为1 女的为0
 	float age;
-	int monney;
+	int money;
 	Field* belongField;
 	House* belongHouse;
-	Object*DrawObject;
+	House* ownHouse = NULL; //给后代的房子
+	Object* DrawObject;
 	int wantFoodLevel;
-	int wantSexLevel;
+	float wantSexLevel;
+	bool isDead = false;
+	bool isTryBuyHouse = false;
 	Object* TakeOnThing[MaxObjectSum];
 	int TakeOnThingSum = 0;
 	void WalkTo(Object* object);
@@ -190,6 +195,9 @@ public:
 	void PutRice();
 	void GetARiceToHand();  //从房子里拿出一个水稻到手上
 	void GetAllRiceToHand(); //从房子里拿出所有水稻到手上
+
+	bool BuyHouse();
+	void judgeDead();
 
 	bool SellRiceForMoney();
 
@@ -203,13 +211,19 @@ public:
 	int id;
 	float age;
 	int money;
+	int Sex; //男的为1 女的为0
 	House* belongHouse;
 	Tree* AimTree=NULL;
 	House* AimUnFinishHouse = NULL;
+	House* ownHouse=NULL; //给后代的房子
+	
+
+	
 	int OwnHouseCount = 0;   //拥有的还没卖出去的房子数量
 	int wantFoodLevel;
-	int wantSexLevel;
+	float wantSexLevel;
 	int buildTime = 0;
+	bool isDead = false;
 	Object* DrawObject;
 	Object* TakeOnThing[MaxObjectSum];
 	int TakeOnThingSum = 0;
@@ -223,13 +237,18 @@ public:
 	void AI();
 	void PutWood();
 	bool BuyRice();
+	bool BuyHouse();
 	bool PutRice();
+	void judgeDead();
+	
 
 	bool HouseForMoney();
 	int LastDaySum = 0; //用来计算食欲的临时变量
 	//买水稻用的临时变量
 	bool isTryBuyRice = false;
 	bool isBuyRiceFinish = false;
+	//买水稻用的临时变量
+	bool isTryBuyHouse = false;
 };
 
 class King
@@ -237,11 +256,13 @@ class King
 public:
 	int id;
 	float age;
-	int monney;
+	int Sex; //男的为1 女的为-1
+	int money;
+	House* ownHouse = NULL; //给后代的房子
 	House* belongHouse;
 	Object* DrawObject;
 	int wantFoodLevel;
-	int wantSexLevel;
+	float wantSexLevel;
 	Object* TakeOnThing;
 	int HaveEmptyHouseSum=0;
 	void WalkTo(Object* object);
@@ -255,7 +276,26 @@ public:
 
 };
 
+class Child
+{
+	int id;
+	int age;
+	int sex;
+};
 
+
+class FamilyTree
+{
+	int FatherType;  //父亲的职业类型
+	int MotherType;  //母亲的职业类型
+	Builder Father0;
+	Farmer Father1;
+	King Father2;
+	Builder Mother0;
+	Farmer Mother1;
+	King Mother2;
+	int ChildType;
+};
 
 const int DayTime = 30;
 
@@ -317,11 +357,11 @@ void AILoop();
 extern bool clkClick;
 void AddUnFinishHouse(int x, int y);
 void AddFinishHouse(int x, int y,int type=0);
-void AddFarmer(int x,int y);
-void AddBuilder(int x,int y);
+void AddFarmer(int x,int y,int sex);
+void AddBuilder(int x,int y,int sex);
 void AddTree(int x,int y);
 void AddField(int x, int y);
-void AddKing(int x, int y);
+void AddKing(int x, int y,int sex=0);
 bool ObjectIsRice(Object* object);
 bool ObjectIsWood(Object* object);
 
