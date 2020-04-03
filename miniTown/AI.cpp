@@ -265,7 +265,7 @@ void Builder::AI()
 		isTryBuyHouse = false;
 		//白天去砍树或种田
 	//在一天的0.2到0.8部分去干活
-		if (DayTimeNow > 0.2 && DayTimeNow < 0.7)
+		if (DayTimeNowRate > 0.2 && DayTimeNowRate < 0.7)
 		{
 			if (wantFoodLevel > 0 || wantSexLevel > 0)
 			{
@@ -495,26 +495,37 @@ bool Builder::HouseForMoney()
 	}
 }
 
+
+//为了保证不同帧率移动速度一样
+//根据当前一帧的时间计算移动速度
+//如移速为10pixel每秒 
+//则200帧下，一次移动10/200
+//50帧下，一次移动10/50
 void Object::WalkTo(Object* object)
 {
-
-	if (object->x >x)
+	int speed = 20;
+	if ((int)object->x > x)
 	{
-		x += timeScale;
-
+		//moveStep是为了解决移动到最后一点距离的时候物体来回晃动而用的
+		float moveStep = min( object->x-x, (float)timeScale * speed * FrameTime);
+		x += moveStep;
 	}
-	else if (object->x < x)
+	else if ((int)object->x < x)
 	{
-		x -= timeScale;
+		float moveStep = min(x-object->x, (float)timeScale * speed * FrameTime);
+		x -= moveStep;
 	}
-	if (object->y > y)
+	if ((int)object->y > y)
 	{
-		y += timeScale;
+		float moveStep = min(object->y-y, (float)timeScale * speed * FrameTime);
+		y += moveStep;
 	}
-	else if (object->y < y)
+	else if ((int)object->y < y)
 	{
-		y -= timeScale;
+		float moveStep = min(y - object->y, (float)timeScale * speed * FrameTime);
+		y -= moveStep;
 	}
+	
 }
 
 
@@ -527,7 +538,7 @@ void Farmer::AI()
 		House* kingHouse = FindKingHouse();
 		//白天去种田
 		//在一天的0.2到0.8部分去干活
-		if (DayTimeNow > 0.2 && DayTimeNow < 0.7)
+		if (DayTimeNowRate > 0.2 && DayTimeNowRate < 0.7)
 		{
 			if (wantFoodLevel > 0 || wantSexLevel > 0)
 			{

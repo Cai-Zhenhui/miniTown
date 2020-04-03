@@ -14,6 +14,7 @@
 #include<tchar.h>
 
 
+
 //----------------------------------
 //调试使用的全局变量
 const bool DebugShowGrowTimeFlag = false;  //输出田和树木的生长、砍伐时间
@@ -59,9 +60,9 @@ public:
 class Object
 {
 public:
-	int x;
-	int y;
-	int z;
+	float x;
+	float y;
+	float z;
 	Picture* pic;
 	void WalkTo(Object* object);
 };
@@ -101,6 +102,7 @@ Color loadTexture(int x, int y, Picture* pic);
 
 extern float runtime;
 extern int LastFPS;
+extern int frame; //当前的帧率
 extern float timeScale;
 
 
@@ -120,7 +122,9 @@ extern int RicePrice;
 extern int HousePrice;
 extern int FirstPayHousePrice; //盖房子预先给木匠的定金
 
-extern float DayTimeNow; //今天的进度(0~1)
+extern float DayTimeNowRate; //今天的进度(0~1)
+extern float DayTimeNow;
+extern float FrameTime; //当前帧间隔时间
 extern int DaySum; 
 
 class Field

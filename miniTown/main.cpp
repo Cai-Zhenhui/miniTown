@@ -1,7 +1,7 @@
 #include"miniTown.h"
 using namespace std;
 
-bool clkClick = false;
+bool clkClick = false; //每过一整秒就设一下为true
 
 Picture picLand;
 Picture picHouse;
@@ -53,11 +53,13 @@ House house[MaxHouseSum];
 
 
 float runtime = 0;
-float DayTimeNow = 0; //今天的进度(0~1)
+float DayTimeNow = 0; //今天的进度(0~DayTime)
+float DayTimeNowRate = 0; //今天的进度(0~1)
 int DaySum = 0; //经过的日子数量
 float timeScale = 1;
 int LastFPS = 0;
-
+float FrameTime = 0; //当前帧间隔时间
+int frame = 0; //帧率
 
 void initLoadPic()
 {
@@ -138,9 +140,11 @@ int main()
 	initLoadPic();
 	initObject();
 
-	int frame = 0;
-	time_t start, stop;
-	start = time(NULL);
+	
+	clock_t start, stop;
+	clock_t OneSecondTime = clock();
+
+	start = clock();
 	
 	//cout << "Time scale?";
 
@@ -154,33 +158,36 @@ int main()
 		MsgGet();
 		Draw();
 		
-		Sleep(1);
 
 		AILoop();
 		ShowSky();
 		
 		frame++;
-		stop = time(NULL);
-		if (stop - start == 1)
+		stop = clock();
+		FrameTime = (stop - start) * 1.0 / CLOCKS_PER_SEC * timeScale;
+		runtime += FrameTime;
+		DayTimeNow+= FrameTime;
+
+		if (DayTimeNow > DayTime)
 		{
-			runtime+=timeScale;
+			DayTimeNow = 0;
+			cout << "Day Out!" << endl;
+		}
+		DayTimeNowRate = DayTimeNow / (float)DayTime;
+		start = stop;
+		if (stop - OneSecondTime >= CLOCKS_PER_SEC)
+		{
+			OneSecondTime = stop;
 			clkClick = true;
-			DayTimeNow = (float)((int)runtime % DayTime) / DayTime;
 
 			DaySum = (int)runtime / DayTime;
 			//cout << DaySum << endl;
-			
-			start = stop;
 			char title[200];
 			sprintf_s(title, "FPS %d ", frame);
 			SetWindowText(screen_handle, title);
 			LastFPS = frame;
 			frame = 0;
 			//cout << "run time:" << runtime << endl;
-		}
-		else if (stop - start > 1)
-		{
-			start = stop;
 		}
 		else
 		{
@@ -203,25 +210,26 @@ void KeyControl()
 	static int pressM = false;
 	static int pressN = false;
 	static int pressB = false;
+	int speed = 20; //村长的移动速度
 	if (screen_keys[VK_ESCAPE])
 	{
 		exit(1);		//正常结束
 	}
 	 if (screen_keys['W'])
 	{
-		king.DrawObject->y--;
+		king.DrawObject->y-= (float)timeScale * speed * FrameTime;
 	}
 	if (screen_keys['S'])
 	{
-		king.DrawObject->y++;
+		king.DrawObject->y+= (float)timeScale * speed * FrameTime;
 	}
 	if (screen_keys['A'])
 	{
-		king.DrawObject->x--;
+		king.DrawObject->x-= (float)timeScale * speed * FrameTime;
 	}
 	if (screen_keys['D'])
 	{
-		king.DrawObject->x++;
+		king.DrawObject->x+= (float)timeScale * speed * FrameTime;
 	}
 	if (screen_keys['L'])  //list 显示当前村民资源
 	{

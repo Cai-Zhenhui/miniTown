@@ -332,8 +332,8 @@ void ResourceCount()//对村民拥有的资源进行统计
 void ShowSky()
 {
 	//白天显示太阳和background
-	objSun.x = ((int)runtime % DayTime) * SCREEN_WIDTH / DayTime*2-objSun.pic->Width;
-	objMoon.x = (((int)runtime) % DayTime) * SCREEN_WIDTH / DayTime * 2 - SCREEN_WIDTH-objMoon.pic->Width;
+	objSun.x = DayTimeNowRate * SCREEN_WIDTH *2-objSun.pic->Width;
+	objMoon.x = DayTimeNowRate * SCREEN_WIDTH  * 2 - SCREEN_WIDTH-objMoon.pic->Width;
 	if(((int)runtime/(DayTime/2))%2==1)
 	{
 		objBackground.pic = &picBackground1;
