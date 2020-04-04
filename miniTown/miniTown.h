@@ -298,6 +298,7 @@ class Child
 
 class FamilyTree
 {
+public:
 	int FatherType;  //父亲的职业类型
 	int MotherType;  //母亲的职业类型
 	Builder *Father0;

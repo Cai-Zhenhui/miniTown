@@ -304,15 +304,63 @@ void Builder::AI()
 						this->HouseForMoney();
 					}
 				}
-				else if (isCanMarriage == true&&DayTimeNowRate<0.5)
+				else if (isMarriage==false && isCanMarriage == true&&DayTimeNowRate<0.5)
 				{
 					//满足结婚条件去村长那里结婚
 					WalkTo(king.DrawObject);
+					//找人结婚
 					for (int i = 0; i < NowFarmerSum; i++)
 					{
-						if (farmer[i].isCanMarriage == true && IsMoreCloseTo(king.DrawObject, farmer[i].DrawObject))
+						if (isCanMarriage==true&& farmer[i].isCanMarriage == true&&farmer[i].Sex!=Sex && IsMoreCloseTo(king.DrawObject, farmer[i].DrawObject))
 						{
 							isCanMarriage = false;
+							farmer[i].isCanMarriage = false;
+							isMarriage = true;
+							farmer[i].isMarriage = true;
+							familyTree = new FamilyTree;
+							if (Sex == 1)
+							{
+								familyTree->FatherType = 0;
+								familyTree->Father0 = this;
+								familyTree->MotherType = 1;
+								familyTree->Mother1 = &farmer[i];
+							}
+							else
+							{
+								familyTree->FatherType = 1;
+								familyTree->Father1 = &farmer[i];
+								familyTree->MotherType = 0;
+								familyTree->Mother0 = this;
+							}
+							cout << "Get Marry!" << endl;
+							break;
+						}
+					}
+					for (int i = 0; i < NowBuilderSum; i++)
+					{
+						if (isCanMarriage==true&& &builder[i] != this && builder[i].isCanMarriage == true && builder[i].Sex != Sex && IsMoreCloseTo(king.DrawObject, builder[i].DrawObject))
+						{
+							isCanMarriage = false;
+							builder[i].isCanMarriage = false;
+							isMarriage = true;
+							builder[i].isMarriage = true;
+							familyTree = new FamilyTree;
+							if (Sex == 1)
+							{
+								familyTree->FatherType = 0;
+								familyTree->Father0 = this;
+								familyTree->MotherType = 0;
+								familyTree->Mother0 = &builder[i];
+							}
+							else
+							{
+								familyTree->FatherType = 0;
+								familyTree->Father0 = &builder[i];
+								familyTree->MotherType = 0;
+								familyTree->Mother0 = this;
+							}
+							cout << "Get Marry!" << endl;
+							break;
 						}
 					}
 
@@ -595,6 +643,68 @@ void Farmer::AI()
 						if (IsMoreCloseTo(DrawObject, kingHouse->DrawObject))
 						{
 							SellRiceForMoney();
+						}
+					}
+
+				}
+				else if (isMarriage == false && isCanMarriage == true && DayTimeNowRate < 0.5)
+				{
+					//满足结婚条件去村长那里结婚
+					WalkTo(king.DrawObject);
+					//找人结婚
+					for (int i = 0; i < NowFarmerSum; i++)
+					{
+						if (isCanMarriage == true&& &farmer[i]!=this && farmer[i].isCanMarriage == true && farmer[i].Sex != Sex && IsMoreCloseTo(king.DrawObject, farmer[i].DrawObject))
+						{
+							isCanMarriage = false;
+							farmer[i].isCanMarriage = false;
+							isMarriage = true;
+							farmer[i].isMarriage = true;
+							familyTree = new FamilyTree;
+							if (Sex == 1)
+							{
+								familyTree->FatherType = 1;
+								familyTree->Father1 = this;
+								familyTree->MotherType = 1;
+								familyTree->Mother1 = &farmer[i];
+							}
+							else
+							{
+								familyTree->FatherType = 1;
+								familyTree->Father1 = &farmer[i];
+								familyTree->MotherType = 1;
+								familyTree->Mother1 = this;
+							}
+							cout << "Get Marry!" << endl;
+							break;
+
+						}
+					}
+					for (int i = 0; i < NowBuilderSum; i++)
+					{
+						if (isCanMarriage == true && builder[i].isCanMarriage == true && builder[i].Sex != Sex && IsMoreCloseTo(king.DrawObject, builder[i].DrawObject))
+						{
+							isCanMarriage = false;
+							builder[i].isCanMarriage = false;
+							isMarriage = true;
+							builder[i].isMarriage = true;
+							familyTree = new FamilyTree;
+							if (Sex == 1)
+							{
+								familyTree->FatherType = 1;
+								familyTree->Father1 = this;
+								familyTree->MotherType = 0;
+								familyTree->Mother0 = &builder[i];
+							}
+							else
+							{
+								familyTree->FatherType = 0;
+								familyTree->Father0 = &builder[i];
+								familyTree->MotherType = 1;
+								familyTree->Mother1 = this;
+							}
+							cout << "Get Marry!" << endl;
+							break;
 						}
 					}
 
