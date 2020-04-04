@@ -4,6 +4,7 @@ int RicePrice=3;
 int HousePrice=30;
 int FirstPayHousePrice = 10;
 int FieldProduceRiceSum = 5;
+int ChildGrowDayTime = 10;
 
 void AILoop()
 {
@@ -104,6 +105,14 @@ void Farmer::Sleep()
 			age += 0.25;
 			//cout << "want food level update " << wantFoodLevel << endl;
 			LastDaySum = DaySum;
+			if (Sex == 1 && ownHouse != NULL)
+			{
+				isCanMarriage = true;
+			}
+			else if (Sex == 0 && money >= RicePrice * ChildGrowDayTime)
+			{
+				isCanMarriage = true;
+			}
 		}
 	}
 }
@@ -120,7 +129,6 @@ void Builder::WalkTo(Object* object)
 		}
 	}
 }
-
 
 
 Tree* Builder::FindATree()
@@ -252,6 +260,14 @@ void Builder::Sleep()
 			age += 0.25;
 			//cout << "want food level update " << wantFoodLevel << endl;
 			LastDaySum = DaySum;
+			if (Sex == 1 && ownHouse != NULL)
+			{
+				isCanMarriage = true;
+			}
+			else if (Sex == 0 && money >= RicePrice * ChildGrowDayTime)
+			{
+				isCanMarriage = true;
+			}
 			ResourceCount();
 		}
 
@@ -287,6 +303,19 @@ void Builder::AI()
 					{
 						this->HouseForMoney();
 					}
+				}
+				else if (isCanMarriage == true&&DayTimeNowRate<0.5)
+				{
+					//满足结婚条件去村长那里结婚
+					WalkTo(king.DrawObject);
+					for (int i = 0; i < NowFarmerSum; i++)
+					{
+						if (farmer[i].isCanMarriage == true && IsMoreCloseTo(king.DrawObject, farmer[i].DrawObject))
+						{
+							isCanMarriage = false;
+						}
+					}
+
 				}
 				else if (this->Sex==1&& this->money >= HousePrice && this->ownHouse == NULL && isTryBuyHouse == false) //有钱就去买房
 				{
@@ -408,7 +437,7 @@ bool Builder::BuyHouse()
 		this->money -= HousePrice;
 		king.money += HousePrice;
 		king.HaveEmptyHouseSum--;
-		this->belongHouse = GetANearEmptyHouse(this->DrawObject);
+		this->ownHouse = GetANearEmptyHouse(this->DrawObject);
 		return true;
 	}
 	return false;
@@ -503,7 +532,7 @@ bool Builder::HouseForMoney()
 //50帧下，一次移动10/50
 void Object::WalkTo(Object* object)
 {
-	int speed = 20;
+	int speed = 40;
 	if ((int)object->x > x)
 	{
 		//moveStep是为了解决移动到最后一点距离的时候物体来回晃动而用的
@@ -552,7 +581,7 @@ void Farmer::AI()
 					{
 						if (IsMoreCloseTo(DrawObject, belongHouse->DrawObject))
 						{
-							GetARiceToHand();
+							GetAllRiceToHand();
 						}
 						WalkTo(belongHouse->DrawObject);
 
@@ -656,7 +685,7 @@ bool Farmer::BuyHouse()
 		this->money -= HousePrice;
 		king.money += HousePrice;
 		king.HaveEmptyHouseSum--;
-		this->belongHouse = GetANearEmptyHouse(this->DrawObject);
+		this->ownHouse = GetANearEmptyHouse(this->DrawObject);
 		return true;
 	}
 	return false;

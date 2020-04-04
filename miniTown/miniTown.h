@@ -118,6 +118,7 @@ const int MaxObjectSum = 1000;
 
 
 extern int FieldProduceRiceSum;
+extern int ChildGrowDayTime;
 extern int RicePrice;
 extern int HousePrice;
 extern int FirstPayHousePrice; //盖房子预先给木匠的定金
@@ -172,7 +173,7 @@ public:
 	void AddWood();
 };
 
-
+class FamilyTree;
 
 class Farmer
 {
@@ -185,6 +186,7 @@ public:
 	House* belongHouse;
 	House* ownHouse = NULL; //给后代的房子
 	Object* DrawObject;
+	FamilyTree* familyTree; //结婚后的家人关系
 	int wantFoodLevel;
 	float wantSexLevel;
 	bool isDead = false;
@@ -199,7 +201,8 @@ public:
 	void PutRice();
 	void GetARiceToHand();  //从房子里拿出一个水稻到手上
 	void GetAllRiceToHand(); //从房子里拿出所有水稻到手上
-
+	bool isCanMarriage = false; //是否满足可以结婚条件
+	bool isMarriage = false; //是否结婚
 	bool BuyHouse();
 	void judgeDead();
 
@@ -220,7 +223,7 @@ public:
 	Tree* AimTree=NULL;
 	House* AimUnFinishHouse = NULL;
 	House* ownHouse=NULL; //给后代的房子
-	
+	FamilyTree* familyTree=NULL; //结婚后的家人关系
 
 	
 	int OwnHouseCount = 0;   //拥有的还没卖出去的房子数量
@@ -234,7 +237,7 @@ public:
 	void WalkTo(Object* object);
 	void BuildHouse();
 	void Eat();
-	void Sleep();
+	void Sleep();  //在睡觉时判断各种状态的更新
 	void CutTree();
 	Tree* FindATree();
 	House* FindAUnFinishHouse();
@@ -247,6 +250,8 @@ public:
 	
 
 	bool HouseForMoney();
+	bool isCanMarriage = false; //是否满足可以结婚条件
+	bool isMarriage = false; //是否结婚
 	int LastDaySum = 0; //用来计算食欲的临时变量
 	//买水稻用的临时变量
 	bool isTryBuyRice = false;
@@ -265,12 +270,15 @@ public:
 	House* ownHouse = NULL; //给后代的房子
 	House* belongHouse;
 	Object* DrawObject;
+	FamilyTree* familyTree=NULL; //结婚后的家人关系
 	int wantFoodLevel;
 	float wantSexLevel;
 	Object* TakeOnThing;
 	int HaveEmptyHouseSum=0;
 	void WalkTo(Object* object);
 	
+	bool isCanMarriage = false; //是否满足可以结婚条件
+	bool isMarriage = false; //是否结婚
 	void AI();
 	void MakeMoney(int Sum);
 	void DestoryMoney(int Sum);
@@ -292,13 +300,14 @@ class FamilyTree
 {
 	int FatherType;  //父亲的职业类型
 	int MotherType;  //母亲的职业类型
-	Builder Father0;
-	Farmer Father1;
-	King Father2;
-	Builder Mother0;
-	Farmer Mother1;
-	King Mother2;
+	Builder *Father0;
+	Farmer *Father1;
+	King *Father2;
+	Builder *Mother0;
+	Farmer *Mother1;
+	King *Mother2;
 	int ChildType;
+
 };
 
 const int DayTime = 30;

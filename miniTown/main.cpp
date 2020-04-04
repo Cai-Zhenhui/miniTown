@@ -210,7 +210,7 @@ void KeyControl()
 	static int pressM = false;
 	static int pressN = false;
 	static int pressB = false;
-	int speed = 20; //村长的移动速度
+	int speed = 40; //村长的移动速度
 	if (screen_keys[VK_ESCAPE])
 	{
 		exit(1);		//正常结束
